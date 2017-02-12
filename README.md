@@ -3,9 +3,9 @@
 # Manifesto:
 
 This project wants to be a framework designed to make developers life easier. The following ideas will be implemented:
-  1. [Direct operations](#Direct-operations) ([active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern)).
-  2. Simple [workflow or tug](#Simple-tug-workflow) for decoupling.
-  3. [No more SQL seeding](#No-more-SQL-seeding-scripts). Use JSON for seeds.
+  1. [Direct operations](#direct-operations) ([active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern)).
+  2. Simple [workflow or tug](#simple-tug-workflow) for decoupling.
+  3. [No more SQL seeding](#no-more-sql-seeding-scripts). Use JSON for seeds.
   
 The implementation language will be Java.
 
@@ -32,7 +32,7 @@ Each tug starts with a coordinator task. The coordinator is responsible for pars
 Since service transactions are hard to achieve when having a tug made of external calls to services a compensation mechanism will be added. In case of an error all the registered compensation tasks will be executed in the reverse order. For example the compensation task of `obj.create` is `obj.delete`.
 The default tug coordinator task will also be able to interrupt the flow as a response to an `INTERRUPT` event that a task could fire. 
   
-#No more SQL seeding scripts. 
+#No more SQL seeding scripts
  We all know that at installation seeding scripts are run first. This has several disadvantages:
   * It takes time to write and maintain SQL scripts for your databases.
   * You need to have DB knowledge of the db structure before you do any modifications.
