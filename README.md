@@ -7,8 +7,11 @@ This project wants to be a MINI framework designed to make developers life easie
   2. Simple [workflow or tug](#simple-tug-workflow) for decoupling.
   3. [No more SQL seeding](#no-more-sql-seeding-scripts). Use JSON for seeds.
   
-The implementation language will be Java. No external library dependencies will be needed except Jackson JSON.
+TugModel focuses more on a friendly API. [Good API](https://www.youtube.com/watch?v=aAb7hSCtvGw) drives results. 
 Similar patterns in: Ruby ActiveModel, JavaLite and Backbone.js.        
+No external library dependencies will be needed except a JSON library(will use Jackson as default JSON mapper).
+ 
+
 
 #Direct operations
  ```java
