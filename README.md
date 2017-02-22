@@ -3,11 +3,12 @@
 # Manifesto:
 
 This project wants to be a framework designed to make developers life easier. The following ideas will be implemented:
-  1. [Direct operations](#direct-operations) ([active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern))..
+  1. [Direct operations](#direct-operations) ([active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern)).
   2. Simple [workflow or tug](#simple-tug-workflow) for decoupling.
   3. [No more SQL seeding](#no-more-sql-seeding-scripts). Use JSON for seeds.
   
 The implementation language will be Java.
+Similar patterns in: Ruby ActiveModel, JavaLite and Backbone.js.        
 
 #Direct operations
  ```java
