@@ -7,7 +7,7 @@ This project wants to be a framework designed to make developers life easier. Th
   2. Simple [workflow or tug](#simple-tug-workflow) for decoupling.
   3. [No more SQL seeding](#no-more-sql-seeding-scripts). Use JSON for seeds.
   
-The implementation language will be Java.
+The implementation language will be Java. No external library dependencies will be needed except Jackson JSON.
 Similar patterns in: Ruby ActiveModel, JavaLite and Backbone.js.        
 
 #Direct operations
