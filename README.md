@@ -14,7 +14,7 @@ The model data can be serialized in any format as long as a corresponding Mapper
 
 #What is for?:
 - for binding specific data(models) to specific processes(tugs)
-- for user friendly APIs (see Joshua Bloch).
+- for user friendly APIs
 - for implementation agnostic APIs
 - for having the UI derive the metadata from backend metadata.
 - for storing models in database, disc, memory. Default implementations available for all three.
