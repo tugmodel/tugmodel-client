@@ -1,0 +1,16 @@
+{
+	"id": "TMeta",	
+	"info": "Metadata base class.",
+	"@extends": "TugModel",
+	"attributes": [
+		{
+			"id": "attributes",
+			"info": "Attributes list.",
+			"dataType": {
+				"id": "List<Attribute>"
+			}		
+		}
+
+	]
+
+}

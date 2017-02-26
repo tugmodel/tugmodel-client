@@ -1,0 +1,31 @@
+{
+	"id": "Model",
+	"info": "Base class for all models.",	
+	"attributes": [
+		{
+			"id": "id",
+			"info": "Unique identifier.",
+			"dataType": {
+				"id": "String"
+			}		
+		},
+		{
+			"id": "version",
+			"info": "Version increases with updates.",
+			"dataType": {
+				"id": "String"
+			}		
+		},
+		{
+			"id": "tenant",
+			"info": "Tenant identification mean in a multitenant system.",
+			"dataType": {
+				"id": "String"
+			}		
+		}
+	]	 
+
+
+
+
+}

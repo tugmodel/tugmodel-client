@@ -1,0 +1,19 @@
+# Tugmodel
+
+Tugmodel is a framework designed to streamline data flow. 
+It was originally written by Cristian Donoiu and has been in development 
+since 2016.
+It is currently developed by a community of developers.
+
+## Licensing
+
+Jackson core and extension components may licensed under different licenses.
+To find the details that apply to this artifact see the accompanying LICENSE file.
+For more information, including possible other licensing options, contact
+Cristian Donoiu.
+
+## Credits
+
+A list of contributors may be found from CREDITS file, which is included
+in some artifacts (usually source distributions); but is always available
+from the source code management (SCM) system project uses.

@@ -1,0 +1,22 @@
+{
+	"NOTE": "Do not modify this file!. Create a file named tm-config.json with you configs. Your file will be merged at runtime over this one.", 
+	"id": "defaults",
+	"version": "1.0",
+	"tug": [
+		{
+			"id": "DefaultConfigTug",
+			"config": {
+				"tug": "com.tugmodel.client.tug.config.DefaultConfigTug",
+				"model": "com.tugmodel.client.model.config.DefaultConfig",				
+				"mapper": {
+					"class": "com.tugmodel.client.mapper.JacksonMapper",
+					"indent": "true"			
+				}
+			}
+		}	
+	],
+	"metadataTugs": [
+		"MetaFileTug"
+	
+	]
+}
