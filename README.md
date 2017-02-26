@@ -55,6 +55,7 @@ The metadata is necessary for allowing a **tug deliver the model** at the destin
 
 **Dependencies**
 
+
 Obs:
   1. [Direct operations](#direct-operations) ([active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern)).
   2. Pluggable network communication tugs and easy configuration of workflow tugs.
