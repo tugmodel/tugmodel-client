@@ -14,10 +14,6 @@
  */
 package com.tugmodel.client.model.config;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.tugmodel.client.model.Model;
 
 /**
@@ -25,18 +21,7 @@ import com.tugmodel.client.model.Model;
  *  
  */
 public class DefaultConfig extends Model<DefaultConfig> {
-	// Since Meta may not be available while reading configuration file.
-	public Map<String, ?> getExtraAttributes() {
-		return data();
-	}	
+
 	
-//	// No sense to complicate API since we are interested only in raw data here.  
-//	public Map getTugs() {
-//		List<Map> tugList = (List<Map>)(((Map)this.get("tugConfig")).get("tugs"));
-//		Map <String, Map> tugs = new HashMap();
-//		for (Map tug : tugList) {
-//			tugs.put((String)tug.get("id"), tug);
-//		}
-//		return tugs;
-//	}
+	
 }

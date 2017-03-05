@@ -15,6 +15,7 @@
 package com.tugmodel.client.model.config;
 
 import com.tugmodel.client.mapper.Mapper;
+import com.tugmodel.client.mapper.jackson.JacksonMappers;
 import com.tugmodel.client.model.Model;
 
 /**
@@ -29,9 +30,13 @@ public class TugConfig<M extends Model<?>> extends Model<M> {
 		if (mapper == null) {
 			String id = getString("mapperId");
 			try {
-				mapper = (Mapper)Class.forName(id).newInstance();
+				//mapper = (Mapper)Class.forName(id).newInstance();
+				//DefaultConfig config = new DefaultConfig().fetch();
+				//config.getMap("tugConfig").get("mappers")
+				
+				mapper = JacksonMappers.getMapper(null);
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException(e);  
 			}
 		}
 		return mapper;

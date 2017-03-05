@@ -16,13 +16,10 @@ package com.tugmodel.client.mapper.jackson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tugmodel.client.model.meta.Meta;
 
@@ -46,23 +43,20 @@ public class MixinsGenerator extends SimpleModule {
 	private static boolean mixinsGenerated = false;
 	private static Map<Class, Class> modelMixins = new HashMap<Class, Class>();
 	
-	// Used only for the initial reading of default configuration file.
-	@JsonPropertyOrder({ "id", "version", "tenant" })
-	@JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
-	public abstract static class DefaultModelMixin {
-		@JsonAnyGetter
-		public abstract java.util.Map getExtraAttributes();
-		
-		@JsonAnySetter
-		public abstract com.tugmodel.client.model.Model set(String name, Object value);
-	}
-	
-	public MixinsGenerator() {
-		super("MixinsGenerator");
+	public MixinsGenerator(String id) {
+		super(id);
 	}
 
 	protected void generateModelMixin(Meta meta, SetupContext context) {
-
+		String pkgName = "com.tugmodel.client.mapper.";
+		String mixinClassName = pkgName + getModuleName() + meta.getId();
+		try {
+			Class.forName(mixinClassName);
+			System.out.println("Mixin " + mixinClassName + " already exists.");
+			return;
+		} catch( ClassNotFoundException e ) {
+			//my class isn't there!			
+		}
 		
 		// https://jboss-javassist.github.io/javassist/tutorial/tutorial3.html
 		// http://blog.javaforge.net/post/31913732423/howto-create-java-pojo-at-runtime-with-javassist
@@ -72,8 +66,7 @@ public class MixinsGenerator extends SimpleModule {
 		// The alternative is using javassist but we will not have access to the
 		// source code.
 		ClassPool pool = ClassPool.getDefault();
-		String pkgName = "com.tugmodel.client.mapper.";
-		CtClass cc = pool.makeClass(pkgName + "MixinFor" + meta.getId());
+		CtClass cc = pool.makeClass(mixinClassName);
 		// CtClass mixinClass = pool.get(pkgName + "ModelMixin"); // Means that
 		// the class already exists.
 
@@ -154,8 +147,10 @@ public class MixinsGenerator extends SimpleModule {
 	@Override
 	public void setupModule(SetupContext context) {
 		
-		// ITEREAZA PE 	Meta.s.findAll();
-		// generateModelMixin(new , context);
+		List<Meta> metas = Meta.s.fetchAll();
+		for (Meta meta : metas) {
+			generateModelMixin(meta, context);
+		}
 	
 	}
 }

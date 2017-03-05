@@ -22,8 +22,27 @@
 				]			
 			},
 			{
+				"id": "Meta",
+				"class": "com.tugmodel.client.model.meta.Meta",
+				"description": "Meta model.",
+				"attributes": [
+					{
+						"id": "description",
+						"dataType": {
+							"id": "String"
+						}
+					},
+					{
+						"id": "attributes",
+						"dataType": {
+							"id": "List<Attribute>"
+						}
+					}
+				]
+			},
+			{
 				"id": "Config",
-				"class": "com.tugmodel.client.model.config.Config",
+				"class": "com.tugmodel.client.model.config.DefaultConfig",
 				"description": "Base configuration obtained by merging your custom config from 'tugmodel-config.json' over defaults in 'tugmodel-config-defaults.json'.",
 				"note": "If you want to store your custom config in a db, then overwrite the 'configTug' and do the defaults merging by either extending 'configTug' and/or calling it manually.",
 				"TODO": "Consider 'postFilter': 'configTug'."				 
@@ -36,7 +55,22 @@
 	},
 	
 	"tugConfig": {
-		"note": "Tug initiator for a model is the tug that serves the type of model or a parent class.",
+		"note1": "Tug initiator for a model is the tug that serves the type of model or a parent class.",
+		"note2": "A mapper is used by a tug to map a model to a format 'transportable' by the tug.",
+		"mappers": [
+			{
+				"id": "defaultMapper",
+				"factory": "com.tugmodel.client.mapper.JacksonMappers",
+				"factory-method": "getMapper",				
+				"config": {
+					"indent": true,
+					"writeDatesAsTimestamps": true,
+					"doNotIncludeNulls": true,
+					"detectIsGetters": false				
+				}
+			}
+		],
+		
 		"tugs": [
 			{
 				"id": "baseTug",
@@ -64,15 +98,6 @@
 				"tugs": "authentication, authorization, manager, audit",
 				"mapperId": "defaultMapper"
 			}
-		],
-		"mappers": [
-			{
-				"id": "defaultMapper",
-				"class": "com.tugmodel.client.mapper.JacksonMapper"
-				
-			}
-		
-		
 		]
 	}					
 }

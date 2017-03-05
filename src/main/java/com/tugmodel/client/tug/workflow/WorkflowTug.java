@@ -14,10 +14,13 @@
  */
 package com.tugmodel.client.tug.workflow;
 
+import com.tugmodel.client.model.Model;
+import com.tugmodel.client.tug.BaseTug;
+
 /**
  *
  *
  */
-public class WorkflowTug {
-
+public class WorkflowTug<M extends Model<?>> extends BaseTug<M> {
+	
 }

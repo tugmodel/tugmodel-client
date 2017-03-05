@@ -63,12 +63,7 @@ public class JacksonMappers {
 			        mapper.configure(SerializationFeature.INDENT_OUTPUT, true); 
 			        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 			        //mapper.enableDefaultTyping();   // Will add type information.
-			        mapper.registerModule(new MixinsGenerator() {
-			        	@Override
-			        	public void setupModule(SetupContext context) {		        		
-			        		context.setMixInAnnotations(Model.class, MixinsGenerator.DefaultModelMixin.class);
-			        	}
-			        });
+			        mapper.registerModule(new MixinsGenerator("ConfigMixins"));
 			        return mapper;
 				}
 			};
@@ -76,12 +71,25 @@ public class JacksonMappers {
 		return configReaderMapper;
 	}
 	
-//	// Returns mapper based on meta.
-//	public static <M extends Model<?>> Mapper<M> getMetaMapper() {
-//		
-//		
-//	}
-	
+
+	public static Mapper getMapper(Object config) {
+		return new JacksonMapper<Model<?>>() {
+			public ObjectMapper initMapper() {
+				ObjectMapper mapper = new ObjectMapper();
+
+				// TODO: All these should come from config-defaults.json.
+				mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // Don't include nulls.
+				mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+				mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+				mapper.configure(MapperFeature.AUTO_DETECT_IS_GETTERS, false);
+				mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+				// mapper.enableDefaultTyping(); // Will add type information.
+				mapper.registerModule(new MixinsGenerator("Mixins"));
+				return mapper;
+			}
+		};
+
+	}
 	
 	
 }

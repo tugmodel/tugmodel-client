@@ -14,14 +14,20 @@
  */
 package com.tugmodel.client.tug;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tugmodel.client.mapper.Mapper;
+import com.tugmodel.client.mapper.jackson.JacksonMappers;
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.model.config.DefaultConfig;
 import com.tugmodel.client.model.config.TugConfig;
+import com.tugmodel.client.model.meta.Attribute;
+import com.tugmodel.client.model.meta.Meta;
 import com.tugmodel.client.tug.config.ConfigTug;
+import com.tugmodel.client.tug.meta.MetaTug;
 
 /**
  * TODO: 
@@ -34,9 +40,40 @@ public class TugFactory {
 	
 	// For the moment keep them in memory for fast retrieval altohugh a Tug could be added to fetch them from a DB.
 	private static HashMap<Class<?>, Tug<?>> MODEL_CLASS_TO_TUG = new HashMap<Class<?>, Tug<?>>();
+//	private static HashMap<Class<?>, Tug<?>> TEMPORARY = new HashMap<Class<?>, Tug<?>>();
 	static {
+		Mapper configMapper = JacksonMappers.getConfigReaderMapper();
+		Tug baseTug = new BaseTug();
+		baseTug.getConfig().setMapper(configMapper);
+		MODEL_CLASS_TO_TUG.put(Model.class, baseTug);
+		
+		Tug configTug = new ConfigTug();
+		configTug.getConfig().setMapper(configMapper);
+		MODEL_CLASS_TO_TUG.put(DefaultConfig.class, configTug);
+
+		final Map<String, Meta> metas = new HashMap();
+		Meta m = new Meta();
+		m.setId("Model");
+		m.set("class", Model.class.getCanonicalName());
+		Attribute a = new Attribute();
+		a.setId("id");
+		m.getAttributes().add(a);
+		metas.put("Model", m);
+		
+		Tug metaTug = new MetaTug() {			
+			public Meta fetchById(String id) {
+				return metas.get(id);
+			}
+			public List<Meta> fetchAll() {
+				return new ArrayList(metas.values());
+			}
+		};
+		metaTug.getConfig().setMapper(configMapper);
+		MODEL_CLASS_TO_TUG.put(Meta.class, metaTug);
+		Meta.s = metaTug;  // TODO: Use reflection to set final field.
+		
 		// Config needs to be initially in the map. Others will be created with the help of it. 
-		initBindings();
+		MODEL_CLASS_TO_TUG = initBindings();
 	}
 	
 	public static <M extends Model<?>> Tug<M> getTug(Class<M> modelClass) {
@@ -48,9 +85,12 @@ public class TugFactory {
 		return tug;
 	}
 	
-	private static void initBindings() {
+	private static HashMap<Class<?>, Tug<?>>  initBindings() {
+		HashMap<Class<?>, Tug<?>> res = new HashMap();
+		
 		DefaultConfig config = new DefaultConfig();		
-		new ConfigTug().fetch(config);  // Need an initial breakpoint.
+		config.fetch();
+		System.out.println(config.toString());
 		
 		// TODO: The config should create Metadata, Attribute, TugConfig objects but this would imply that the tug for these are known before reading. 
 		//		which cames down to the code bellow or the alternative would be to set a dummy metatug until the system is up and then replace it and 
@@ -71,12 +111,13 @@ public class TugFactory {
 			try {
 				Tug tugInstance = (Tug) Class.forName((String)tug.get("class")).newInstance();
 				tugInstance.setConfig(tc);
-				MODEL_CLASS_TO_TUG.put(Class.forName((String)model.get("class")), tugInstance);
+				res.put(Class.forName((String)model.get("class")), tugInstance);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
-			}
-			
+			}			
 		}
+		
+		return res;
 	}
 	protected static <M extends Model<?>> Tug<M> getNearestTug(Class<M> modelClass) {
 		Tug tug = MODEL_CLASS_TO_TUG.get(modelClass);

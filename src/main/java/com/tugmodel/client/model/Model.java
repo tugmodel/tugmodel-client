@@ -117,6 +117,14 @@ public class Model<M extends Model<?>> {
     	return (Boolean) data.get(attr);
     }    
     
+    public Map getMap(String attr) {
+    	return (Map) data.get(attr);
+    }
+    
+    public List getList(String attr) {
+    	return (List) data.get(attr);
+    }
+
     public String getId() {
         return getString(ID);
     }
@@ -138,12 +146,14 @@ public class Model<M extends Model<?>> {
     // Returns attributes that are set but were not listed in the metadata.
     public Map<String, ?> getExtraAttributes() {
     	Meta meta = Meta.s.fetchById(getId());
-    	Map<String, Attribute> attrs = meta.attrMap();    	
-    	Map<String, Object> extra = new HashMap();
-    	for (Map.Entry<String, Object> entry : data.entrySet()) {
-    		if (!attrs.containsKey(entry.getKey())) {
-    			extra.put(entry.getKey(), entry.getValue());
-    		}
+    	if (meta != null) {
+	    	Map<String, Attribute> attrs = meta.attrMap();    	
+	    	Map<String, Object> extra = new HashMap();
+	    	for (Map.Entry<String, Object> entry : data.entrySet()) {
+	    		if (!attrs.containsKey(entry.getKey())) {
+	    			extra.put(entry.getKey(), entry.getValue());
+	    		}
+	    	}
     	}
     	return data;
     }

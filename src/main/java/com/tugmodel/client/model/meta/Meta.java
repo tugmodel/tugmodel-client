@@ -28,7 +28,7 @@ import com.tugmodel.client.tug.TugFactory;
  *
  */
 public class Meta extends Model<Meta> {
-	public static Tug<Meta> s = TugFactory.getTug(Meta.class); 
+	public static /*final*/ Tug<Meta> s = TugFactory.getTug(Meta.class); 
 	
 	public String getDescription() {
 		return getString("description");
