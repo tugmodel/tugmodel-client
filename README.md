@@ -2,38 +2,57 @@
 
 #What it is?:
 
-Tugmodel is a full framework made of three concepts:
-###1. **Tugs**.
-###2. **Models**.   
-###3. **Metadata**.
-**A tug** can be a workflow or a work horse that drives and processes your data models. 
-**A model** is an **active POJO** that stores the data and is delivered & processed by tugs. 
-**A metadata** is also a model but it stores descriptive, structural and administrative information about a model that keeps real data.
-Default implementations for all 3 concepts are available but you can also easily plug in **your own tugs, your own models and your own metadata**.
-The model data can be serialized in any format as long as a corresponding Mapper exists. 
+Tugmodel is a tugged(active) POJO framework, metadata framework, domain model keeper, service orchestrator, SQL/NoSQL ORM, distributed service framework, **do it yourself framework**. 
 
-#What is for?:
-- for binding specific data(models) to specific processes(tugs)
-- for user friendly APIs
-- for implementation agnostic APIs
-- for having the UI derive the metadata from backend metadata.
-- for storing models in database, disc, memory. Default implementations available for all three.
-- for chaining calls: new TModel().set("f", 1).save();
-- for decoupling code into processing units and combining those units easily
+It has 3 concepts: **TUGS, MODELS and METADATA**.
+  1. **A tug** can be a task, workflow, comunication mean, storage mean, processing mean, etc. Basically it is a service abstraction interface used to **drive(tug)**, transport or process the models. Inspired by BPMN activities.
+  2. **A model** is an **active POJO** that stores the data processed by the tugs. 
+  3. **A metadata** is also a model but it stores descriptive, structural and administrative information about a model that keeps real data.
+You can/should **plug in your own tugs, your own models and your own metadata**. Default implementations are provided mainly for reference and basic functionality.
+
+#Use cases:
+- for abstracting the communication/processing layer(active record pattern - by Martin Fowler):
+      `model.save()` instead of `MySaveService.save(model)`.
+- for allowing an **EXTENSIBLE model** (`model.set(key, value)`) where **unexpected** attributes can be stored by the model . 
+- for user friendly and implementation agnostic APIs.
+- for having the GUI derive the domain model metadata from backend metadata. **E.g.: if a model attribute maxLength restriction changes then that will automatically be enforced in the UI**.
+- for storing models in **database, files, memory**. Default implementations available for all three.
+- for storing models in SQL db an **ORM like tug** is available:
+```java
+      List<Employee> list = Employee.s.where("country=US&status=active").limit(40).offset(20).orderBy("name asc");
+      Employee e = list.get(0);
+      e.delete();
+      Employee emp = new Employee().setId("user1234").fetch();
+      emp.setName("John Doe");
+      emp.set("extraField", "extra info");
+      emp.save();      
+ ```
+- for decoupling code into processing units and combining those units easily using workflows and proxy tugs.
 - for service orchestration and code decoupling using linear workflow (SimpleWorkflowTug). No BPMN support yet. 
-- for calling operations(tugs) remotely like they would be run locally 
+- for calling operations(tugs) remotely like they would be run locally. 
 - for multitenancy
-- for promoting configuration using JSON files (you can implement custom <Format>ComfigTug for specific file format)
-- for removing the need for SQL seeds and instead promotes JSON seeds.
+- for chaining calls: new Model().set("attr", 1).save();
+- for configuration using JSON files (you can implement also non JSON Config models)
 - for when system configuration is also a model that can be fetched or updated(config.setMyConfig("X").update()).
-- for You can share the jar that contains your models with an external product caller or you can restrict the usage of tugmodel only within your product.
+- for removing the need for SQL seeds and instead promotes JSON seeds.
+- for internal product(same process or not) communication using POJOs(the models) and communication tugs. For multi process communication the models and communication tugs should to be bundled together in an `interfaces_common.jar` that is accessible by both processes.
+- for external product communication like for example [REST](https://martinfowler.com/articles/richardsonMaturityModel.html), a model can be easily constructed from a REST request:
+```java
+   // GET /slots/1234
+      Slot slot = new Slot().setId("1234").fetch();
+      
+   // GET /slots?date=20100104&status=open
+      List<Slot> slots = Slot.s.where("date=20100104&status=open");
+      return slots;
+ ```  
 - for code interpretation/generation based on metadata. We favor code interpretation over code generation.
 - for your own custom metadata. Default implementation is also available for extension.
-- for allowing an extensible model where unexpected attributes can be stored by the model and processed by the corresponding tug.
 
 **Demo**
 Hello world demo using a User model.
 1. Create model. Model classes can also be generated from the provided metadata as long as the metadata follows the general format.
+	NOTE: You need to add a static field that refers to the tug behind the class.
+	      The alternative to this would be an instrumentation maven plugin that would add the static field/method automatically (using javassist). 
 2. Select/configure a default tug for your model.
 3. Define metadata. 
 This is all, now you can tug the model.

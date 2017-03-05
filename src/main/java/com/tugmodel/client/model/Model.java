@@ -1,18 +1,28 @@
-/**
+/*
  * Copyright (c) 2017- Cristian Donoiu
- * Licensed under the License specified in file LICENSE, included with the source code and binary code bundles.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.tugmodel.client.model;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.tugmodel.client.model.meta.Attribute;
+import com.tugmodel.client.model.meta.Meta;
 import com.tugmodel.client.tug.Tug;
 import com.tugmodel.client.tug.TugFactory;
 
@@ -54,25 +64,35 @@ import com.tugmodel.client.tug.TugFactory;
  *     		XModel.s.find(id, auth);
  *     2. Better: the Tug should obtain and send/process caller info.
  * 
+ * 
  */
-public class Model<M extends Model<?>> implements Externalizable {	
+public class Model<M extends Model<?>> {	
 	public static String ID = "id";   // Should be externalized in properties file.
-	public static String VERSION = "version";
-	public static String TENANT = "tenant";
 
 	protected boolean isNew = false;  // This model has not been fetched.
 	protected Map<String, Object> data = Collections.synchronizedMap(new LinkedHashMap<String, Object>()); // TODO: Consider data TugBean. 
 	
 	public Model() {
 		setId(UUID.randomUUID().toString());
-		setVersion("1.0");		
 	}	
 	
     public Object get(String attr) {
         return data.get(attr);
     }
 
-    // Shortcut.
+    public <T> T get(String attr, Class<T> valueType) {
+        T value = (T)data.get(attr);
+        return value;
+    }
+    public <T> T get(String attr, T defaultValue) {
+        T value = (T)get(attr);
+        if (value == null) {
+        	return defaultValue;
+    	}
+        return value;
+    }
+    
+    // Shortcut. TODO: Consider removing only the "get" part in order to be ignored by the mapper or add to ignore list. Still the Jackson mapper was did not include them.
     public String getString(String attr) {
     	return (String) data.get(attr);
     }
@@ -105,23 +125,7 @@ public class Model<M extends Model<?>> implements Externalizable {
         return set(ID, value);
     }
     
-    public String getVersion() {
-        return getString(VERSION);
-    }
-    
-    public M setVersion(String value) {
-        return set(VERSION, value);
-    }
-    
-    public String getTenant() {
-        return getString(TENANT);
-    }
-    
-    public M setTenant(String value) {
-        return set(TENANT, value);
-    }
-	
-    protected Map<String, Object> attributes() {
+    protected Map<String, Object> data() {
     	return data;    	
     }
 
@@ -133,19 +137,23 @@ public class Model<M extends Model<?>> implements Externalizable {
     
     // Returns attributes that are set but were not listed in the metadata.
     public Map<String, ?> getExtraAttributes() {
-    	// TODO: Iterate on Meta model.
+    	Meta meta = Meta.s.fetchById(getId());
+    	Map<String, Attribute> attrs = meta.attrMap();    	
+    	Map<String, Object> extra = new HashMap();
+    	for (Map.Entry<String, Object> entry : data.entrySet()) {
+    		if (!attrs.containsKey(entry.getKey())) {
+    			extra.put(entry.getKey(), entry.getValue());
+    		}
+    	}
     	return data;
     }
     
-    
-//    public Servicer<AM> getServicer() {
-//        return ServicerFactory.get((Class<AM>) this.getClass());
-//    }
     
     // No get in front to not hide a potential field with same name.
     protected Tug<M> tug() {
     	return TugFactory.getTug((Class<M>)this.getClass());
     }
+    
     public M fetch() {
     	
     	M m = tug().fetch((M)this);
@@ -153,27 +161,34 @@ public class Model<M extends Model<?>> implements Externalizable {
     	return m;
     }
     
-//    // Used for both create and save.
-//    public void save() {    	
-//    	getTug().fetch((M)this);
-//    }
+    // Used for both create and save.
+    public M save() {    	
+    	if (isNew) {
+    		return tug().create((M)this);
+    	}
+   		return tug().update((M)this);
+    }
+    
+    public M delete() {    	
+    	return tug().delete((M)this);
+    }
+    
+    /**
+     * Use for business actions(non CRUD). This should be called from a model subclass for a specific operation. E.g.:
+     * 		myModel.enable(), myModel.makePublic(), ...
+     * For business operations that affect multiple models use the 
+     * @param operation
+     * @return
+     */
+    public M run(String operation, List<Object> params) {    	
+    	return tug().run(operation, params);
+    }
+    
     
     // Use only for pretty print.
     @Override
     public String toString() {
-    	return tug().getConfig().getMapper().toPrettyString(this);
+    	return tug().getConfig().getMapper().toPrettyString(this);   //tug().getConfig().getMapper().convert(this, String.class)
     }
     
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		// TODO Auto-generated method stub
-		
-	}	
-	
-	
 }

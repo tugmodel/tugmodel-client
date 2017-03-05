@@ -12,21 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.tug.storage;
+package com.tugmodel.client.model.meta;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.BaseTug;
 
 /**
  * 
  *
  */
-public class FileTug<M extends Model<?>> extends BaseTug<M> {
-	protected File folder;
+public class ConfigMeta<M extends ConfigMeta<?>> extends Model<M> {
 	
-
-
-	
+	// Returns the list of model fields that should be set in a separate file.
+	// TODO: Set the model fields within a json file that is read without metadata.
+	public List<Attribute> getAttributes() {
+		List<Attribute> attributes = new ArrayList<Attribute>();
+		
+//		JacksonMapper mapper = new JacksonMapper<Model<?>>();
+//		FileConfigTug tug = new FileConfigTug();
+//		tug.readFile(path)
+//		mapper.convert(Files.read, toValueType)
+		
+		return attributes;
+	}
 }

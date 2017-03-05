@@ -12,12 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.tug.proxy;
+package com.tugmodel.client.list;
+
+import java.util.ArrayList;
+
+import com.tugmodel.client.model.Model;
 
 /**
- * 
- *
+ * Laxy list used when querying data. 
  */
-public class BusinessTug {
+public class ModelList<M extends Model> extends ArrayList<M> {
+	private static final long serialVersionUID = 1L;
+	private int pageSize;
+	private int start;
+	
+	private String where;
+	private String orderBy;
+	private Object[] values;
 
+	
 }

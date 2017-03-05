@@ -12,12 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.tug.proxy;
+package com.tugmodel.client.model.meta;
+
+import com.tugmodel.client.model.Model;
 
 /**
  * 
  *
  */
-public class BusinessTug {
+public class Attribute extends Model<Attribute> {
 
+	
+	
 }

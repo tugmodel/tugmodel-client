@@ -12,12 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.tug.proxy;
+package com.tugmodel.client.tug.meta;
+
+import com.tugmodel.client.model.meta.Meta;
+import com.tugmodel.client.tug.BaseTug;
 
 /**
- * 
- *
+ * Provides metadata.
  */
-public class BusinessTug {
+public class MetaTug extends BaseTug<Meta> {
 
+
+	
+	
 }
