@@ -19,7 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tugmodel.client.model.meta.Meta;
 
@@ -42,6 +47,22 @@ import javassist.bytecode.annotation.StringMemberValue;
 public class MixinsGenerator extends SimpleModule {
 	private static boolean mixinsGenerated = false;
 	private static Map<Class, Class> modelMixins = new HashMap<Class, Class>();
+	
+	@JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
+	@JsonPropertyOrder({ "id", "version", "tenant" })
+	public static abstract class ConfigMixin {
+		 @JsonAnyGetter
+		 //public abstract Map getExtraAttributes();
+		 public abstract Map<String, Object> data();
+		 @JsonIgnore
+		 public abstract String getId();
+		 @JsonIgnore
+		 public abstract Map getExtraAttributes();
+		 @JsonAnySetter
+		 public abstract com.tugmodel.client.model.Model set(String name, Object value);
+
+	}
+	
 	
 	public MixinsGenerator(String id) {
 		super(id);

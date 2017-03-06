@@ -14,6 +14,12 @@
  */
 package com.tugmodel.client.tug.meta;
 
+import java.util.Collections;
+import java.util.List;
+
+import com.tugmodel.client.model.Model;
+import com.tugmodel.client.model.config.DefaultConfig;
+import com.tugmodel.client.model.meta.Attribute;
 import com.tugmodel.client.model.meta.Meta;
 import com.tugmodel.client.tug.BaseTug;
 
@@ -22,7 +28,22 @@ import com.tugmodel.client.tug.BaseTug;
  */
 public class MetaTug extends BaseTug<Meta> {
 
-
-	
+	@Override
+    public List<Meta> fetchAll() {
+    	
+		
+		DefaultConfig config = new DefaultConfig();
+		config.fetch();
+		
+		// TODO: read from config. Be careful to not have an infinite loop.
+		Meta m = new Meta();
+		m.setId("Model");
+		m.set("class", Model.class.getCanonicalName());
+		Attribute a = new Attribute();
+		a.setId("id");
+		m.getAttributes().add(a);
+		
+		return Collections.singletonList(m);
+    }
 	
 }

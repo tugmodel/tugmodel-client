@@ -31,7 +31,11 @@ import com.tugmodel.client.tug.BaseTug;
  * 
  */
 public class ConfigTug<M extends DefaultConfig> extends BaseTug<M> {
-		
+	
+	public ConfigTug() {
+		getConfig().setMapper(JacksonMappers.getConfigReaderMapper());
+	}
+	
 	public M fetch(M model) {
 		
 		getConfig().getMapper().updateModel(readClasspathFile("/tugmodel/tugmodel-config-defaults.json"), model);

@@ -14,12 +14,16 @@
  */
 package com.tugmodel.client.mapper.jackson;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.Module.SetupContext;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tugmodel.client.mapper.Mapper;
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.model.config.DefaultConfig;
@@ -63,7 +67,13 @@ public class JacksonMappers {
 			        mapper.configure(SerializationFeature.INDENT_OUTPUT, true); 
 			        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 			        //mapper.enableDefaultTyping();   // Will add type information.
-			        mapper.registerModule(new MixinsGenerator("ConfigMixins"));
+			        mapper.registerModule(new SimpleModule("ConfigMixins") {
+			        	@Override
+			        	public void setupModule(SetupContext context) {
+			        		context.setMixInAnnotations(Model.class, MixinsGenerator.ConfigMixin.class);			        		
+			        	}
+			        	
+			        });
 			        return mapper;
 				}
 			};

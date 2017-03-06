@@ -14,20 +14,15 @@
  */
 package com.tugmodel.client.tug;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tugmodel.client.mapper.Mapper;
 import com.tugmodel.client.mapper.jackson.JacksonMappers;
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.model.config.DefaultConfig;
 import com.tugmodel.client.model.config.TugConfig;
-import com.tugmodel.client.model.meta.Attribute;
-import com.tugmodel.client.model.meta.Meta;
 import com.tugmodel.client.tug.config.ConfigTug;
-import com.tugmodel.client.tug.meta.MetaTug;
 
 /**
  * TODO: 
@@ -38,55 +33,22 @@ import com.tugmodel.client.tug.meta.MetaTug;
  */
 public class TugFactory {
 	
-	// For the moment keep them in memory for fast retrieval altohugh a Tug could be added to fetch them from a DB.
-	private static HashMap<Class<?>, Tug<?>> MODEL_CLASS_TO_TUG = new HashMap<Class<?>, Tug<?>>();
-//	private static HashMap<Class<?>, Tug<?>> TEMPORARY = new HashMap<Class<?>, Tug<?>>();
+	// Using 2 allows for lazy initialisation of tugs and model classes.
+	private static HashMap<String, String> MODEL_TO_TUG = new HashMap<String, String>();
+	private static HashMap<String, Tug<?>> MODEL_TO_TUG_INSTANCE = new HashMap<String, Tug<?>>();
 	static {
-		Mapper configMapper = JacksonMappers.getConfigReaderMapper();
-		Tug baseTug = new BaseTug();
-		baseTug.getConfig().setMapper(configMapper);
-		MODEL_CLASS_TO_TUG.put(Model.class, baseTug);
-		
-		Tug configTug = new ConfigTug();
-		configTug.getConfig().setMapper(configMapper);
-		MODEL_CLASS_TO_TUG.put(DefaultConfig.class, configTug);
-
-		final Map<String, Meta> metas = new HashMap();
-		Meta m = new Meta();
-		m.setId("Model");
-		m.set("class", Model.class.getCanonicalName());
-		Attribute a = new Attribute();
-		a.setId("id");
-		m.getAttributes().add(a);
-		metas.put("Model", m);
-		
-		Tug metaTug = new MetaTug() {			
-			public Meta fetchById(String id) {
-				return metas.get(id);
-			}
-			public List<Meta> fetchAll() {
-				return new ArrayList(metas.values());
-			}
-		};
-		metaTug.getConfig().setMapper(configMapper);
-		MODEL_CLASS_TO_TUG.put(Meta.class, metaTug);
-		Meta.s = metaTug;  // TODO: Use reflection to set final field.
-		
+		// Needed initially to read files.
+		ConfigTug tug = new ConfigTug<>();
+		tug.getConfig().setMapper(JacksonMappers.getConfigReaderMapper());
+		MODEL_TO_TUG_INSTANCE.put(DefaultConfig.class.getCanonicalName(), tug);
 		// Config needs to be initially in the map. Others will be created with the help of it. 
-		MODEL_CLASS_TO_TUG = initBindings();
+		MODEL_TO_TUG = initBindings();
+		MODEL_TO_TUG_INSTANCE.clear();
 	}
 	
-	public static <M extends Model<?>> Tug<M> getTug(Class<M> modelClass) {
-		//return new FileTug<M>();
-		
-		
-		Tug<M> tug = getNearestTug(modelClass);
-
-		return tug;
-	}
-	
-	private static HashMap<Class<?>, Tug<?>>  initBindings() {
-		HashMap<Class<?>, Tug<?>> res = new HashMap();
+	// Needs to be LAZY so that no tugs are instantiated until necessary!.
+	private static HashMap<String, String>  initBindings() {
+		HashMap<String, String> res = new HashMap();
 		
 		DefaultConfig config = new DefaultConfig();		
 		config.fetch();
@@ -109,9 +71,10 @@ public class TugFactory {
 				tc.set(k, tug.get(k));
 			}
 			try {
-				Tug tugInstance = (Tug) Class.forName((String)tug.get("class")).newInstance();
-				tugInstance.setConfig(tc);
-				res.put(Class.forName((String)model.get("class")), tugInstance);
+//				Tug tugInstance = (Tug) Class.forName((String)tug.get("class")).newInstance();
+//				tugInstance.setConfig(tc);
+				//res.put(Class.forName((String)model.get("class")), tugInstance);
+				res.put((String)model.get("class"), (String)tug.get("class"));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}			
@@ -119,23 +82,51 @@ public class TugFactory {
 		
 		return res;
 	}
-	protected static <M extends Model<?>> Tug<M> getNearestTug(Class<M> modelClass) {
-		Tug tug = MODEL_CLASS_TO_TUG.get(modelClass);
+	
+	public static <M extends Model<?>> Tug<M> getTug(Class<M> modelClass) {
+		
+		Tug<M> tug = getNearestTug(modelClass);
+
+		return tug;
+	}
+	
+	protected static <M extends Model<?>> Tug<M> getNearestTug(Class<M> mClass) {
+		String modelClass = mClass.getCanonicalName();
+		Tug tug = MODEL_TO_TUG_INSTANCE.get(modelClass);
 		if (tug != null)
 			return tug;
 		
 		
-		// Find nearest
-		Class nearestParentModel = Model.class;
-		for (Class c : MODEL_CLASS_TO_TUG.keySet()) {
-			if (c.isAssignableFrom(modelClass) && nearestParentModel.isAssignableFrom(c)) {
-				nearestParentModel = c;
+		// Find nearest.
+		String tugName = MODEL_TO_TUG.get(modelClass);
+		if (tugName == null) {
+			Class nearestParentClass = Model.class;
+			for (String k : MODEL_TO_TUG.keySet()) {
+				try {
+					Class c = Class.forName(k);
+					if (c.isAssignableFrom(mClass) && nearestParentClass.isAssignableFrom(c)) {
+						nearestParentClass = c;
+					}
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			tugName = MODEL_TO_TUG.get(nearestParentClass.getCanonicalName());
+			// Remember lookup.		
+			MODEL_TO_TUG.put(modelClass, tugName);
+		}
+
+		// Reuse same tug as parent.
+		tug = MODEL_TO_TUG_INSTANCE.get(tugName);
+		if (tug == null) {  // Should not happen if got from a parent, put the binding also for the parent!.
+			try {
+				tug = (Tug)Class.forName(tugName).newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
-		// TODO: Use config reader to search for stuff.
-		tug = MODEL_CLASS_TO_TUG.get(nearestParentModel);
-		// Remember lookup.		
-		MODEL_CLASS_TO_TUG.put(modelClass, tug);
+		MODEL_TO_TUG_INSTANCE.put(modelClass, tug);
+
 		return tug;
 	}
 }
