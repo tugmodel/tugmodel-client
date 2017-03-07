@@ -25,16 +25,22 @@ import com.tugmodel.client.model.Model;
  */
 public class TugConfig<M extends Model<?>> extends Model<M> {	
 	protected Mapper<M> mapper;	
+
+	public TugConfig() {	
+	}
+	public TugConfig(Model other) {
+		super(other);
+	}
 	
 	public Mapper<M> getMapper() {
 		if (mapper == null) {
-			String id = getString("mapperId");
 			try {
-				//mapper = (Mapper)Class.forName(id).newInstance();
-				//DefaultConfig config = new DefaultConfig().fetch();
-				//config.getMap("tugConfig").get("mappers")
-				
-				mapper = JacksonMappers.getMapper(null);
+				// TODO: Parse TugConfig and construct apropriatelly.
+				if ("defaultMapper".equals(getId())) { 
+					mapper = JacksonMappers.getMapper(null);
+				} else { 
+					mapper = JacksonMappers.getConfigReaderMapper();
+				}					
 			} catch (Exception e) {
 				throw new RuntimeException(e);  
 			}
@@ -48,7 +54,7 @@ public class TugConfig<M extends Model<?>> extends Model<M> {
 	}
 	
 	public Class<? extends Model<?>> getModelClass() {
-		String id = getString("modelId");
+		String id = asString("modelId");
 //		Meta<Meta<?>>.s.get
 		try {
 			return (Class<? extends Model<?>>)Class.forName(id);

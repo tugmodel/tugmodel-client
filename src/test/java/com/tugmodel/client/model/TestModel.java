@@ -15,8 +15,10 @@
 package com.tugmodel.client.model;
 
 import java.io.IOException;
+import java.util.List;
 
-import com.tugmodel.client.model.config.DefaultConfig;
+import com.tugmodel.client.model.config.Config;
+import com.tugmodel.client.model.meta.Meta;
 
 import javassist.CannotCompileException;
 import javassist.NotFoundException;
@@ -26,16 +28,15 @@ import javassist.NotFoundException;
  *
  */
 public class TestModel {
-
 	public static void main(String args[]) throws ClassNotFoundException, NotFoundException, IOException, CannotCompileException {
-		// Loading tugmodel configuration necessary as first step for every kind of config models.		
-		// Put this in a static block inside TugFactory { loadConfig };
-		
 		
 //		Model m = new Model();
 //		m.save();  // Should throw not implemented exception.
-		
-		DefaultConfig config = new DefaultConfig();
+
+//		Meta meta = new Meta();
+
+				
+		Config config = new Config();
 		
 		
 		System.out.println(config.toString());
@@ -44,6 +45,10 @@ public class TestModel {
 		
 		System.out.println("aaa");
 
+		List<Meta> metas = Meta.s.fetchAll();
+		Meta modelMeta = Meta.s.fetchById("Model");
+		
+		
 		
 
 				

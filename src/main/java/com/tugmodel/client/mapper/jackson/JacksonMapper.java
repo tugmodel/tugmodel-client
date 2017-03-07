@@ -82,7 +82,7 @@ public abstract class JacksonMapper<M extends Model<?>> extends AbstractStringMa
 	 */
 	public String toPrettyString(Object fromValue) {
 		try {
-			return getMapper().writeValueAsString(fromValue);  //((Model)fromValue).setTug(null);
+			return getMapper().writeValueAsString(fromValue);  //fromValue.hashCode()
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e); //e.printStackTrace();
 		}

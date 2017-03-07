@@ -12,29 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.meta;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.tugmodel.client.model.config;
 
 import com.tugmodel.client.model.Model;
 
 /**
- * 
- *
+ * Configuration files.
+ *  
  */
-public class ConfigMeta<M extends ConfigMeta<?>> extends Model<M> {
+public class Config extends Model<Config> {
 	
-	// Returns the list of model fields that should be set in a separate file.
-	// TODO: Set the model fields within a json file that is read without metadata.
-	public List<Attribute> getAttributes() {
-		List<Attribute> attributes = new ArrayList<Attribute>();
-		
-//		JacksonMapper mapper = new JacksonMapper<Model<?>>();
-//		FileConfigTug tug = new FileConfigTug();
-//		tug.readFile(path)
-//		mapper.convert(Files.read, toValueType)
-		
-		return attributes;
+	// Be careful for the method name to match the property in the JSON.
+	public MetadataConfig getMetadataConfig() {
+		return (MetadataConfig) get("metadataConfig");
 	}
+	
+	public Config setMetadataConfig(MetadataConfig mc) {
+		return set("metadataConfig", mc);
+	}
+	
+	public TugsConfig getTugsConfig() {
+		return (TugsConfig) get("tugsConfig");
+	}
+	
+	public Config setTugsConfig(TugsConfig value) {
+		return set("tugsConfig", value);
+	}
+
 }

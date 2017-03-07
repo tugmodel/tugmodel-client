@@ -14,11 +14,14 @@
  */
 package com.tugmodel.client.tug.meta;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.tugmodel.client.list.ModelList;
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.model.config.DefaultConfig;
+import com.tugmodel.client.model.config.Config;
 import com.tugmodel.client.model.meta.Attribute;
 import com.tugmodel.client.model.meta.Meta;
 import com.tugmodel.client.tug.BaseTug;
@@ -27,23 +30,70 @@ import com.tugmodel.client.tug.BaseTug;
  * Provides metadata.
  */
 public class MetaTug extends BaseTug<Meta> {
+	private Map<String, Meta> metas = null;
+	
+	private void loadMeta() {
+		if (metas != null)
+			return;
+		metas = new HashMap();
+		Config config = new Config();
+		config.fetch();
 
+		List<Model> models = config.getMetadataConfig().getMetadata();
+		for (Model m : models) {
+			Meta meta = this.config.getMapper().convert(m, Meta.class);
+			metas.put(meta.getId(), meta);
+		}
+		
+		// Now all meta's inherit attributes from their parents.
+		for (Meta meta : metas.values()) {
+			Class modelClass = meta.modelClass();
+			inheritAttributes(modelClass, meta, metas);
+		}
+	}
+	
+	private static void inheritAttributes(Class c, Meta meta, Map<String, Meta> metas) {
+		Class parentClass = c.getSuperclass();
+		if (parentClass.equals(Object.class))
+			return;
+		Meta parent = metas.get(parentClass.getCanonicalName());
+		Map <String, Attribute> metaAttributes = meta.attrMap();
+		if (parent != null) {
+			for (Attribute a : parent.getAttributes()) {
+				if(!metaAttributes.containsKey(a.getId())) {
+					meta.getAttributes().add(a);
+				}
+			}
+		}
+		
+		inheritAttributes(parentClass, meta, metas);//meta.getAttributes()
+	}
+	
 	@Override
     public List<Meta> fetchAll() {
-    	
+		loadMeta();		
 		
-		DefaultConfig config = new DefaultConfig();
-		config.fetch();
-		
-		// TODO: read from config. Be careful to not have an infinite loop.
-		Meta m = new Meta();
-		m.setId("Model");
-		m.set("class", Model.class.getCanonicalName());
-		Attribute a = new Attribute();
-		a.setId("id");
-		m.getAttributes().add(a);
-		
-		return Collections.singletonList(m);
+		return new ArrayList(metas.values());
     }
 	
+	public Meta fetchById(String id) {
+		loadMeta();
+		
+		return metas.get(id);		
+	}
+	
+	public ModelList<Meta> where(String query, Object... params) {
+		ModelList<Meta> list = new ModelList();
+		
+		// TODO: Need a parser, predicate tool.
+		// https://www.google.ro/search?q=sql+parser&oq=sql+parser&aqs=chrome..69i57j0l5.1519j0j4&sourceid=chrome&ie=UTF-8#q=sql+java+parser&*
+		String splits[] = query.split("=");
+		
+		for (Meta meta : metas.values()) {
+			if (meta.get(splits[0]).equals(params[0])) {
+				list.add(meta);
+			}
+		}
+		return list;
+	}
 }

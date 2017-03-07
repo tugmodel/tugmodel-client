@@ -12,16 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.config;
+package com.tugmodel.client.model.sample;
 
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.TugFactory;
 
 /**
- * Configuration files.
- *  
+ * Clasical Oracle example.
  */
-public class DefaultConfig extends Model<DefaultConfig> {
-
+public class Employee extends Model<Employee> {
+	public static final Tug<Employee> s = TugFactory.getTug(Employee.class); 
 	
+	
+	public String getName() {
+		return asString("name");
+	}
+	
+	public Employee setName(String name) {
+		return set("name", name);
+	}
 	
 }

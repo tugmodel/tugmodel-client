@@ -21,7 +21,7 @@ import java.io.InputStreamReader;
 
 import com.tugmodel.client.mapper.jackson.JacksonMappers;
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.model.config.DefaultConfig;
+import com.tugmodel.client.model.config.Config;
 import com.tugmodel.client.tug.BaseTug;
 
 /**
@@ -30,7 +30,7 @@ import com.tugmodel.client.tug.BaseTug;
  * 
  * 
  */
-public class ConfigTug<M extends DefaultConfig> extends BaseTug<M> {
+public class ConfigTug<M extends Config> extends BaseTug<M> {
 	
 	public ConfigTug() {
 		getConfig().setMapper(JacksonMappers.getConfigReaderMapper());

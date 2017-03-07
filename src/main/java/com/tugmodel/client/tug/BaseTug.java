@@ -44,48 +44,41 @@ public class BaseTug<M extends Model<?>> implements Tug<M> {
 		throw new RuntimeException("You need to implement the inherited Tug method.");
 	}
 	
-	@Override
 	public M fetch(M model) {
 		return (M)notImplementedException();
 	}
-	
-	@Override
+		
     public M create(M model) {
 		return (M)notImplementedException();
     }
 
-	@Override
-    public M update(M model) {
+	public M update(M model) {
 		return (M)notImplementedException();
     }
-    
-	@Override
+    	
     public M delete(M model) {
 		return (M)notImplementedException();
     }
-
-	@Override
+	
 	public M run(String operation, List<Object> params) {
 		// TODO Auto-generated method stub
 		return null;
 	}	
 		
-	// Additional parameters provided for sending authorization token.
-	@Override
+	// Additional parameters provided for sending authorization token.	
     public M fetchById(String id) {
     	return (M)notImplementedException();
-    }
-    
-	@Override
+    }    
+	
     public List<M> fetchAll() {
     	return (List<M>)notImplementedException();
     }
 
     // A lazy list similar to the one in JavaLite.
-	@Override
     public ModelList<M> where(String query, Object... params) {
     	return (ModelList<M>)notImplementedException();
     }
+
 
 
 }

@@ -19,12 +19,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.tugmodel.client.model.meta.Attribute;
 import com.tugmodel.client.model.meta.Meta;
 import com.tugmodel.client.tug.Tug;
 import com.tugmodel.client.tug.TugFactory;
+import com.tugmodel.client.util.ReflectionUtil;
 
 /**
  * Base class for all models. It is used by tug interface for various operations.
@@ -69,12 +71,17 @@ import com.tugmodel.client.tug.TugFactory;
 public class Model<M extends Model<?>> {	
 	public static String ID = "id";   // Should be externalized in properties file.
 
-	protected boolean isNew = false;  // This model has not been fetched.
+	protected boolean isNew = false;   // This model has not been fetched.
+	protected boolean useMeta = false; // If meta should be used when obtaining extra attributes or just check that getter exists.
 	protected Map<String, Object> data = Collections.synchronizedMap(new LinkedHashMap<String, Object>()); // TODO: Consider data TugBean. 
 	
 	public Model() {
 		setId(UUID.randomUUID().toString());
-	}	
+	}
+	// Copy constructor.
+	public Model(Model other) {		
+		data = other.data();
+	}
 	
     public Object get(String attr) {
         return data.get(attr);
@@ -87,46 +94,50 @@ public class Model<M extends Model<?>> {
     public <T> T get(String attr, T defaultValue) {
         T value = (T)get(attr);
         if (value == null) {
+        	set(attr, defaultValue);
         	return defaultValue;
     	}
         return value;
     }
     
-    // Shortcut. TODO: Consider removing only the "get" part in order to be ignored by the mapper or add to ignore list. Still the Jackson mapper was did not include them.
-    public String getString(String attr) {
+    public void doNotUseMeta() {
+    	useMeta = false;
+    }
+    // Shortcuts.
+    public String asString(String attr) {
     	return (String) data.get(attr);
     }
     
-    public Byte getByte(String attr) {
+    public Byte asByte(String attr) {
     	return (Byte) data.get(attr);
     }
     
-    public Integer getInteger(String attr) {
+    public Integer asInteger(String attr) {
     	return (Integer) data.get(attr);
     }
     
-    public Long getLong(String attr) {
+    public Long asLong(String attr) {
     	return (Long) data.get(attr);
     }
 
-    public Double getDouble(String attr) {
+    public Double asDouble(String attr) {
     	return (Double) data.get(attr);
     }
     
-    public Boolean getBoolean(String attr) {
+    public Boolean asBoolean(String attr) {
     	return (Boolean) data.get(attr);
     }    
     
-    public Map getMap(String attr) {
+    public Map asMap(String attr) {
     	return (Map) data.get(attr);
     }
     
-    public List getList(String attr) {
+    public List asList(String attr) {
     	return (List) data.get(attr);
     }
 
     public String getId() {
-        return getString(ID);
+        return asString(ID);
     }
     
     public M setId(String value) {
@@ -145,17 +156,29 @@ public class Model<M extends Model<?>> {
     
     // Returns attributes that are set but were not listed in the metadata.
     public Map<String, ?> getExtraAttributes() {
-    	Meta meta = Meta.s.fetchById(getId());
-    	if (meta != null) {
-	    	Map<String, Attribute> attrs = meta.attrMap();    	
-	    	Map<String, Object> extra = new HashMap();
-	    	for (Map.Entry<String, Object> entry : data.entrySet()) {
-	    		if (!attrs.containsKey(entry.getKey())) {
-	    			extra.put(entry.getKey(), entry.getValue());
-	    		}
+    	Map<String, Object> extra = new HashMap();  //this.hashCode()
+    	
+    	if (useMeta) {
+	    	Meta meta = Meta.s.fetchById(getId());
+	    	if (meta != null) {
+		    	Map<String, Attribute> attrs = meta.attrMap();	    	
+		    	for (Map.Entry<String, Object> entry : data.entrySet()) {
+		    		if (!attrs.containsKey(entry.getKey())) {
+		    			extra.put(entry.getKey(), entry.getValue());
+		    		}
+		    	}
+		    	return extra;
 	    	}
     	}
-    	return data;
+    	// Else use getters. TODO: Obtain getters only once not each time.
+    	Set<String> myProps = ReflectionUtil.findGetterProperties(this.getClass());
+    	myProps.remove("extraAttributes");
+    	for (Map.Entry<String, Object> entry : data.entrySet()) {
+    		if (!myProps.contains(entry.getKey())) {
+    			extra.put(entry.getKey(), entry.getValue());
+    		}
+    	}
+    	return extra;
     }
     
     
@@ -198,7 +221,7 @@ public class Model<M extends Model<?>> {
     // Use only for pretty print.
     @Override
     public String toString() {
-    	return tug().getConfig().getMapper().toPrettyString(this);   //tug().getConfig().getMapper().convert(this, String.class)
+    	return tug().getConfig().getMapper().toPrettyString(this);   //this.hashCode()
     }
     
 }

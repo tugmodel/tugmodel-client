@@ -24,36 +24,35 @@ import com.tugmodel.client.tug.Tug;
 import com.tugmodel.client.tug.TugFactory;
 
 /**
- * 
- *
+ * Metadata model.
  */
 public class Meta extends Model<Meta> {
 	public static final Tug<Meta> s = TugFactory.getTug(Meta.class); 
 	
 	public String getDescription() {
-		return getString("description");
+		return asString("description");
 	}
 	
 	public Meta setDescription(String description) {
 		return set("description", description);
 	}
 	
-	public Class<?> getModelClass() {
+	public Class<?> modelClass() {
 		try {
-			return Class.forName(getString("class"));
+			return Class.forName(asString("class"));
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	// Shortcut method.
-	public Attribute attr(String id) {
-		for (Attribute attr : getAttributes()) {  // TODO: cache some map?.
-			if (id.equals(attr.getId()))
-				return attr;
-		}
-		return null;
-	}
+//	// Shortcut method.
+//	public Attribute attr(String id) {
+//		for (Attribute attr : getAttributes()) {  // TODO: cache some map?.
+//			if (id.equals(attr.getId()))
+//				return attr;
+//		}
+//		return null;
+//	}
 	
 	public Map<String, Attribute> attrMap() {
 		Map<String, Attribute> map = new HashMap();

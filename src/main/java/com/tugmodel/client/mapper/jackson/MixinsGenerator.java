@@ -15,7 +15,6 @@
 package com.tugmodel.client.mapper.jackson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.tugmodel.client.model.Model;
 import com.tugmodel.client.model.meta.Meta;
 
 import javassist.ClassPool;
@@ -45,22 +45,18 @@ import javassist.bytecode.annotation.StringMemberValue;
  * Setup mixins based on the meta information.
  */
 public class MixinsGenerator extends SimpleModule {
-	private static boolean mixinsGenerated = false;
-	private static Map<Class, Class> modelMixins = new HashMap<Class, Class>();
 	
+	/**
+	 * This mixin does not use Meta information. Is only used to bootstrap the loading/config of the framework.
+	 * Since it does not have access to meta information a model.toString will make fields appear twice.
+	 */
 	@JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
 	@JsonPropertyOrder({ "id", "version", "tenant" })
-	public static abstract class ConfigMixin {
+	public static abstract class BootstrapMixin {
 		 @JsonAnyGetter
-		 //public abstract Map getExtraAttributes();
-		 public abstract Map<String, Object> data();
-		 @JsonIgnore
-		 public abstract String getId();
-		 @JsonIgnore
 		 public abstract Map getExtraAttributes();
 		 @JsonAnySetter
-		 public abstract com.tugmodel.client.model.Model set(String name, Object value);
-
+		 public abstract Model set(String name, Object value);
 	}
 	
 	
@@ -155,8 +151,7 @@ public class MixinsGenerator extends SimpleModule {
 
 			// cc.writeFile(); // Write file to disc. It works.
 			Class mixinClass = cc.toClass();
-			//context.setMixInAnnotations(Model.class, mixinClass);
-			context.setMixInAnnotations(meta.getModelClass(), mixinClass);
+			context.setMixInAnnotations(meta.modelClass(), mixinClass);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);

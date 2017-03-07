@@ -3,10 +3,10 @@
 	"id": "defaults",
 	"version": "1.0",	
 	
-	"metadata": {
+	"metadataConfig": {
 		"note": "TODO: Model classes can be generated automatically(freemaker) using default interpreter or your own but is better that you manually maintain them.",
 		"generateClasses": "false",
-		"models": [
+		"metadata": [
 			{
 				"id": "Model",
 				"class": "com.tugmodel.client.model.Model",
@@ -42,21 +42,64 @@
 			},
 			{
 				"id": "Config",
-				"class": "com.tugmodel.client.model.config.DefaultConfig",
+				"class": "com.tugmodel.client.model.config.Config",
 				"description": "Base configuration obtained by merging your custom config from 'tugmodel-config.json' over defaults in 'tugmodel-config-defaults.json'.",
 				"note": "If you want to store your custom config in a db, then overwrite the 'configTug' and do the defaults merging by either extending 'configTug' and/or calling it manually.",
 				"TODO": "Consider 'postFilter': 'configTug'."				 
-			}
-			
+			},
+			{
+				"id": "Employee",
+				"class": "com.tugmodel.client.model.sample.Employee",
+				"description": "Sample model.",
+				"attributes": [
+					{
+						"id": "name",
+						"dataType": {
+							"id": "String"
+						}
+					}
+				]
+			}			
 		],
 		"dataTypes": [
 		
 		]
 	},
 	
-	"tugConfig": {
+	"tugsConfig": {
 		"note1": "Tug initiator for a model is the tug that serves the type of model or a parent class.",
-		"note2": "A mapper is used by a tug to map a model to a format 'transportable' by the tug.",
+		"tugs": [
+			{
+				"id": "baseTug",
+				"class": "com.tugmodel.client.tug.BaseTug",
+				"modelId": "Model",
+				"mapperId": "nonMetaBasedMapper"
+			},
+			{
+				"id": "configTug",
+				"class": "com.tugmodel.client.tug.config.ConfigTug",
+				"modelId": "Config",
+				"mapperId": "nonMetaBasedMapper"
+			},
+			{
+				"id": "metaTug",
+				"class": "com.tugmodel.client.tug.meta.MetaTug",
+				"modelId": "Meta",
+				"mapperId": "nonMetaBasedMapper"
+			},
+			{
+				"id": "sqlTug",
+				"class": "com.tugmodel.client.tug.sql.SQLTug",
+				"modelId": "Model",
+				"mapperId": "defaultMapper",
+				"dbDriver": "com.mysql.jdbc.Driver",
+				"dbUrl": "jdbc:mysql://localhost:3306/testcris",
+				"user": "root",
+				"pass": ""
+			}
+		],	
+		
+		"note2": "A mapper is used by a tug to map a model to a format 'transportable' by the tug.",			
 		"mappers": [
 			{
 				"id": "defaultMapper",
@@ -68,35 +111,17 @@
 					"doNotIncludeNulls": true,
 					"detectIsGetters": false				
 				}
-			}
-		],
-		
-		"tugs": [
-			{
-				"id": "baseTug",
-				"class": "com.tugmodel.client.tug.BaseTug",
-				"modelId": "Model",
-				"mapperId": "defaultMapper"
 			},
 			{
-				"id": "configTug",
-				"class": "com.tugmodel.client.tug.config.ConfigTug",
-				"modelId": "Config",
-				"mapperId": "defaultMapper"
-			},
-			{
-				"id": "metaTug",
-				"class": "com.tugmodel.client.tug.meta.MetaTug",
-				"modelId": "Meta",
-				"mapperId": "defaultMapper"
-			},
-			{
-				"id": "workflowSampleTug",
-				"class": "com.tugmodel.client.tug.workflow.WorkflowTug",
-				"modelId": "Model",
-				"note": "This is a linear workflow(non BPMN), still events are available in order to trigger event termination or for registering transaction compensation events.", 
-				"tugs": "authentication, authorization, manager, audit",
-				"mapperId": "defaultMapper"
+				"id": "nonMetaBasedMapper",
+				"factory": "com.tugmodel.client.mapper.JacksonMappers",
+				"factory-method": "getConfigReaderMapper",				
+				"config": {
+					"indent": true,
+					"writeDatesAsTimestamps": true,
+					"doNotIncludeNulls": true,
+					"detectIsGetters": false				
+				}
 			}
 		]
 	}					

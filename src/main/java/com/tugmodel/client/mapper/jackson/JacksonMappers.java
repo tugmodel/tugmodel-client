@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.Module.SetupContext;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tugmodel.client.mapper.Mapper;
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.model.config.DefaultConfig;
+import com.tugmodel.client.model.config.Config;
 import com.tugmodel.client.model.meta.Attribute;
 import com.tugmodel.client.model.meta.Meta;
 
@@ -70,7 +70,7 @@ public class JacksonMappers {
 			        mapper.registerModule(new SimpleModule("ConfigMixins") {
 			        	@Override
 			        	public void setupModule(SetupContext context) {
-			        		context.setMixInAnnotations(Model.class, MixinsGenerator.ConfigMixin.class);			        		
+			        		context.setMixInAnnotations(Model.class, MixinsGenerator.BootstrapMixin.class);			        		
 			        	}
 			        	
 			        });
