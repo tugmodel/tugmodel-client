@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tugmodel.client.model.Model;
@@ -51,7 +50,7 @@ public class MixinsGenerator extends SimpleModule {
 	 * Since it does not have access to meta information a model.toString will make fields appear twice.
 	 */
 	@JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
-	@JsonPropertyOrder({ "id", "version", "tenant" })
+	@JsonPropertyOrder({ "id", "version", "tenant" })	
 	public static abstract class BootstrapMixin {
 		 @JsonAnyGetter
 		 public abstract Map getExtraAttributes();
@@ -131,6 +130,9 @@ public class MixinsGenerator extends SimpleModule {
 		orderAttr.addAnnotation(orderAnnot);
 		ccFile.addAttribute(orderAttr);
 
+		// Add type info on specific class or set at mapper wide level for all classes.
+		// @JsonTypeInfo(defaultImpl = MyModel.class, include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.MINIMAL_CLASS)
+		
 		try {
 			// cc.addMethod(m);
 			String extraMethodDef = "public abstract java.util.Map getExtraAttributes();";

@@ -36,21 +36,6 @@ import com.tugmodel.client.model.meta.Meta;
  */
 public class JacksonMappers {
 	
-	public static ObjectMapper getAMapper() {
-						ObjectMapper mapper = new ObjectMapper();
-
-				// TODO: All these should come from config-defaults.json.
-		        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // Don't include nulls.
-		        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-		        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
-		        mapper.configure(MapperFeature.AUTO_DETECT_IS_GETTERS, false);
-		        //mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-		        //mapper.enableDefaultTyping();   // Will add type information.
-		        //mapper.configure(SerializationFeature.INDENT_OUTPUT, true); 
-		        return mapper;
-	
-	}
-	
 	private static Mapper configReaderMapper = null;
 	// Does basic json config reading, no metadata involved.
 	public static Mapper getConfigReaderMapper() {		

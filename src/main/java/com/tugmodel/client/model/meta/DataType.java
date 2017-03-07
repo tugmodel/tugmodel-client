@@ -15,13 +15,16 @@
 package com.tugmodel.client.model.meta;
 
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.TugFactory;
 
 /**
  * 
  *
  */
 public class DataType<DT extends DataType<?>> extends Model<DT> {
-	
+//	// Tug over default datatypes.
+//	public static final Tug<DataType> s = TugFactory.getTug(DataType.class);
 	    
 
 }

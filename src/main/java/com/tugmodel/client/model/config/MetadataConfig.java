@@ -42,4 +42,20 @@ public class MetadataConfig extends Model<MetadataConfig> {
 	public MetadataConfig setMetadata(List<Model> meta) {
 		return set("metadata", meta);		
 	}
+	
+	public List<Model> getDataTypes() {
+		return (List<Model>)get("dataTypes");
+	}
+	
+	public Map<String, Model> dataTypeAsMap() {
+		Map<String, Model> map = new HashMap();
+		List<Model> metas = getDataTypes();
+		for (Model m : metas) {
+			map.put(m.getId(), m);
+		}
+		return map;
+	}
+	public MetadataConfig setDataTypes(List<Model> meta) {
+		return set("dataTypes", meta);		
+	}
 }

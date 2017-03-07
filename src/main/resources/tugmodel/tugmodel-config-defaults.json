@@ -14,9 +14,10 @@
 				"description": "parent for all models",
 				"attributes": [
 					{
-						"id": "id",
+						"id": "id",						
 						"dataType": {
-							"id": "String"
+							"id": "String",
+							"max": "1001"
 						}
 					}
 				]			
@@ -35,10 +36,38 @@
 					{
 						"id": "attributes",
 						"dataType": {
-							"id": "List<Attribute>"
+							//"id": "oneOne",   // Specialized version of oneMany.
+							//"reference":"Address",
+							// "ownership": true    // Means that the entry it contains is not shared with others. Else the corresponding tug for that child is called. 
+							
+							//"id": "oneMany",
+							//"reference":"Address",
+							
+							//"id": "manyMany",  // Via asociation table.
+							//"reference":"Address",
+
+							"id": "oneMany",
+							"reference":"Attribute"							
 						}
 					}
 				]
+			},
+			{
+				"id": "Attribute",
+				"class": "com.tugmodel.client.model.meta.Attribute",
+				"attributes": [
+					{
+						"id": "dataType",						
+						"dataType": {
+							"id": "oneOne",
+							"reference":"DataType"
+						}
+					}
+				]			
+			},
+			{
+				"id": "DataType",
+				"class": "com.tugmodel.client.model.meta.DataType"
 			},
 			{
 				"id": "Config",
@@ -55,14 +84,35 @@
 					{
 						"id": "name",
 						"dataType": {
-							"id": "String"
+							"id": "String",
+							"max": 100
 						}
 					}
 				]
 			}			
 		],
 		"dataTypes": [
-		
+			{
+				"id": "String",
+				"class": "java.lang.String",
+				"min": 0,
+				"max": 2147483647
+				// TODO: "validatorId" 			
+			},
+			{
+				"id": "StringMax64",
+				"class": "java.lang.String",
+				"min": 0,
+				"max": 64			
+			},
+			{
+				"id": "Integer",
+				"class": "java.lang.Integer"
+			},
+			{
+				"id": "oneOne",
+				"javaType": "java.lang.Object"
+			}
 		]
 	},
 	
@@ -90,12 +140,20 @@
 			{
 				"id": "sqlTug",
 				"class": "com.tugmodel.client.tug.sql.SQLTug",
-				"modelId": "Model",
+				"modelId": "Employee",
 				"mapperId": "defaultMapper",
 				"dbDriver": "com.mysql.jdbc.Driver",
 				"dbUrl": "jdbc:mysql://localhost:3306/testcris",
 				"user": "root",
-				"pass": ""
+				"pass": "",
+				"dataType2dbType": {
+					// First lookup is in DataType.get("dbType");
+					"java": {                    // Second lookup.
+						"java.lang.String": "varchar(255)",
+						"java.lang.Integer": "int"
+					},
+					"default": "varchar(255)"   // Third lookup.
+				}
 			}
 		],	
 		
@@ -109,7 +167,8 @@
 					"indent": true,
 					"writeDatesAsTimestamps": true,
 					"doNotIncludeNulls": true,
-					"detectIsGetters": false				
+					"detectIsGetters": false,
+					"enableDefaultTyping": true
 				}
 			},
 			{
