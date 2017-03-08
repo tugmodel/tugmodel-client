@@ -35,10 +35,10 @@ public class Attribute extends Model<Attribute> {
 	public Attribute setDataType(DataType dt) {
 		Config config = new Config().fetch();
 	    // Use the Model copy constructor or use the mapper. Let's try the mapper.
-		Mapper<DataType> mapper = TugFactory.getTug(DataType.class).getConfig().getMapper();
+		Mapper mapper = TugFactory.getTug(DataType.class).getConfig().getMapper();
 		Model defaultDTModel = config.getMetadataConfig().dataTypeAsMap().get(dt.getId());
 		if (defaultDTModel != null) {
-			DataType defaultDT = mapper.convert(defaultDTModel, DataType.class);
+			DataType defaultDT = (DataType)mapper.convert(defaultDTModel, DataType.class);
 			mapper.updateModel(defaultDT.toString(), dt);
 		}
 		return this;

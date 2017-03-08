@@ -39,15 +39,58 @@ You can/should **plug in your own tugs, your own models and your own metadata**.
 - for internal product(same process or not) communication using POJOs(the models) and communication tugs. For multi process communication the models and communication tugs should to be bundled together in an `interfaces_common.jar` that is accessible by both processes.
 - for external product communication like for example [REST](https://martinfowler.com/articles/richardsonMaturityModel.html), a model can be easily constructed from a REST request:
 ```java
-   // GET /slots/1234
-      Slot slot = new Slot().setId("1234").fetch();
+   	// GET /slots/1234
+    Slot slot = new Slot().setId("1234").fetch();
       
    // GET /slots?date=20100104&status=open
-      List<Slot> slots = Slot.s.where("date=20100104&status=open");
-      return slots;
+   List<Slot> slots = Slot.s.where("date=20100104&status=open");
+   return slots;
  ```  
 - for code interpretation/generation based on metadata. We favor code interpretation over code generation.
 - for your own custom metadata. Default implementation is also available for extension.
+- for model business API's a generic `tug#run` plumbing method is available but it implies the user to register handlers on the tug side. Solution 1:
+```java
+		MyModel#enable() {
+			tug().run("enable");  
+		}
+	    //... on tug side
+	    MyTug#init() {
+	       	addAction("enable", new Action() {
+	       		public Object run(Object... params) {
+	       			MyTug#enable();
+	       			return null;
+				}
+	       	});
+	    }
+	    MyTug#run(String operation, Object... params) {
+	    	return getAction(operation).run(params);
+	    }
+```
+  Solution 2: is to create a Java interface with the business methods. 
+  That interface is to be implemented by your model and by the receiving tug. **You could see your model as modeling a service interface on the client side.** 
+  The tug `run` method will do the delegation automatically based on the methods in that interface without the need to do manual delegation. 
+  
+  Solution 3(TODO: implement this one). It needs just an interface. The factory will return a proxy implementing that interface(using javassist and reflection).
+  The proxy will call then the `run` method of a specific service broker Tug(may be a network transport tug).
+  That tug will introspect(reflection) the interface and will call a dedicated interface implementation. E.g.:
+  **Provider side(tugmodel-config.json:)**:
+```json
+	{
+	    // ...
+	    "serviceBroker": "com.tugmodel.tug.BrokerTug"
+		"services" : [		
+			{
+				"interface": "com.x.MyInterface",
+				"impl": "com.x.impl.MyInterfaceImpl"
+			}
+		]
+	}
+```
+  **Client side.** The client side needs access only to the Java interface(and the method parameters that it uses). The trasport and brokering is done by the BrokerTug.   
+```java
+  MyInterface proxy = TugFactory.getService(MyInterface.class);
+  proxy.doBusinessTogether(modelX, modelY) 
+```
 
 **Demo**
 Hello world demo using a User model.

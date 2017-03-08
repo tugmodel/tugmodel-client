@@ -70,15 +70,24 @@ public class BaseTug<M extends Model<?>> implements Tug<M> {
     	return (M)notImplementedException();
     }    
 	
-    public List<M> fetchAll() {
-    	return (List<M>)notImplementedException();
-    }
-
     // A lazy list similar to the one in JavaLite.
     public ModelList<M> where(String query, Object... params) {
     	return (ModelList<M>)notImplementedException();
     }
 
+	@Override
+	public M fetchFirst() {
+		return (M)notImplementedException();
+	}
 
+	@Override
+	public List<M> fetchAll() {
+		return (ModelList<M>)notImplementedException();
+	}
+
+	@Override
+	public ModelList<M> fetchByQuery(String query, Object... params) {
+		return (ModelList<M>)notImplementedException();
+	}
 
 }

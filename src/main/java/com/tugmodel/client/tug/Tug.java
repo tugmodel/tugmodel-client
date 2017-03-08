@@ -43,6 +43,7 @@ public interface Tug<M extends Model<?>> {
 
     public M delete(M model);
 
+    // This method is for custom business API (SPI).
     public M run(String operation, List<Object> params);
 
 	
@@ -52,10 +53,15 @@ public interface Tug<M extends Model<?>> {
 		
 	// Additional parameters provided for sending authorization token.
     public M fetchById(String id);
-    
-    public List<M> fetchAll();
 
-    // A lazy list similar to the one in JavaLite.
+    public M fetchFirst();
+
+    // ModelList is a lazy active list.
+    public List<M> fetchAll();
+    
+    // Provide a complete query. E.g. "select * from ...".
+    public ModelList<M> fetchByQuery(String query, Object... params);
+
     public ModelList<M> where(String query, Object... params);
 
 
