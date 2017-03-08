@@ -27,11 +27,12 @@ You can/should **plug in your own tugs, your own models and your own metadata**.
       emp.set("extraField", "extra info");
       emp.save();      
  ```
+- for fluent interfaces(by Martin Fowler). TODO: give sample.
+- for chaining calls: new Model().set("attr", 1).save();
 - for decoupling code into processing units and combining those units easily using workflows and proxy tugs.
 - for service orchestration and code decoupling using linear workflow (SimpleWorkflowTug). No BPMN support yet. 
 - for calling operations(tugs) remotely like they would be run locally. 
 - for multitenancy. Keeping diffs beetween JSON based mappers can be achieved with one of the [free](https://www.google.ro/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=Java+library+that+diffs+JSON&*) JSON libraries. This way original model is kept at root level while for tenants only differences are kept.
-- for chaining calls: new Model().set("attr", 1).save();
 - for configuration using JSON files (you can implement also non JSON Config models)
 - for when system configuration is also a model that can be fetched or updated(config.setMyConfig("X").update()).
 - for removing the need for SQL seeds and instead promotes JSON seeds.
