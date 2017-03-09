@@ -71,9 +71,13 @@ public interface Tug<M extends Model> {
     // Provide a complete query. E.g. "select * from ...". This should return the results in front.
     public <C extends Model> List<C> fetchByRawQuery(Class<C> c, String query, Object... params);
 
+	//////////////////////////////////////////////////////////////////////
+	// Transactions - Make more sense when tug is in same process. But there can be also remote transactions.
+	//////////////////////////////////////////////////////////////////////
+    public void transactionStart();
     
+    public void trasactionCommit();
 
-
-
-	
+    public void trasactionRollback();
+    
 }
