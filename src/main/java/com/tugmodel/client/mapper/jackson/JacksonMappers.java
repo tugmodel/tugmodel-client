@@ -40,7 +40,7 @@ public class JacksonMappers {
 	// Does basic json config reading, no metadata involved.
 	public static Mapper getConfigReaderMapper() {		
 		if (configReaderMapper == null) {
-			configReaderMapper = new JacksonMapper<Model<?>>() {
+			configReaderMapper = new JacksonMapper<Model>() {
 				public ObjectMapper initMapper() {
 					ObjectMapper mapper = new ObjectMapper();
 	
@@ -68,7 +68,7 @@ public class JacksonMappers {
 	
 
 	public static Mapper getMapper(Object config) {
-		return new JacksonMapper<Model<?>>() {
+		return new JacksonMapper<Model>() {
 			public ObjectMapper initMapper() {
 				ObjectMapper mapper = new ObjectMapper();
 

@@ -15,6 +15,7 @@
 package com.tugmodel.client.list;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -22,135 +23,222 @@ import java.util.ListIterator;
 
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.TugFactory;
 
 /**
  * Lazy list used when querying data.
+ * A list is driven by a tug also indirectly via the tug assigned to the model. 
  */
-public class ModelList<M extends Model<?>> extends ArrayList<M> {
-	protected String where = null;
-	protected Object[] params = null;
-	protected Integer offset = null;
-	protected Integer limit = null;
-	protected String orderBy = null;
-
-	protected Tug<M> tug;
+public class ModelList<M extends Model> extends ArrayList<M> {
+	private static final long serialVersionUID = 1L;
+	protected String where = "";
+    protected Object[] params = new Object[]{};
+    protected Integer offset = 1;
+    protected Integer limit = 0;
+    protected String orderBy = "";
+    
+    protected String childId;
+	protected String modelId;
 	
-	public ModelList() {
-		
+	public ModelList() {		
 	}
-	public ModelList(Tug<M> tug) {
-		this.tug = tug;
-	}
+    public ModelList(Collection<M> c) {
+        super(c);
+        fetched = true;
+    }
+    
+    public ModelList<M> modelId(Class modelClass) {
+        modelId = modelClass.getCanonicalName();
+        return this;
+    }
+    public ModelList<M> modelId(String modelId) {
+        this.modelId = modelId;
+        return this;
+    }
+    
+    public boolean isFetchAll() {
+    	return limit == 0 && offset == 1 && "".equals(where) && "".equals(orderBy);
+    }
+    
+    public boolean isFetchById() {
+    	return "id=?".equals(where) && limit == 0 && offset == 1 && "".equals(orderBy) && params.length == 1;
+    }
 
-	public ModelList<M> where(String val, Object... values) {
-		where = val;
-		params = values;
-		return this;
-	}
+    public boolean isFetchFirst() {
+    	return "".equals(where) && limit == 1 && offset == 1 && "".equals(orderBy);
+    }
 
-	public ModelList<M> offset(int val) {
-		offset = val;
-		return this;
-	}
+    public boolean isPaginated() {
+        return limit != 0;
+    }
+    
+    public String getModelId() {
+        return modelId;
+    }
 
-	public ModelList<M> limit(int val) {
-		limit = val;
-		return this;
-	}
+    public ModelList<M> where(String val, Object... params) {
+        where = val;
+        this.params = params;
+        return this;
+    }
 
-	public ModelList<M> orderBy(int val) {
-		offset = val;
-		return this;
-	}
+    public ModelList<M> setWhere(String val) {
+        where = val;
+        return this;
+    }
 
-	protected boolean populated = false;
+    public String getWhere() {
+        return where;
+    }
 
-	protected void populate() {
-		if (populated)
-			return;
-		System.out.println("populate");
-		String query = where; // Construct query from internal data.
-		List list = tug.fetchByQuery(query, params); 
-		this.addAll(list);
+    public ModelList<M> offset(int val) {
+        offset = val;
+        return this;
+    }
 
-		populated = true;
+    public int getOffset() {
+        return offset;
+    }
+
+    public ModelList<M> limit(int val) {
+        limit = val;
+        return this;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public ModelList<M> orderBy(String val) {
+        orderBy = val;
+        return this;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public ModelList<M> params(Object[] val) {
+        params = val;
+        return this;
+    }
+
+    public Object[] getParams() {
+        return params;
+    }
+
+    public ModelList<M> child(String val) {
+        childId = val;
+        return this;
+    }
+    
+    public ModelList<M> child(Class val) {
+        childId = val.getCanonicalName();
+        return this;
+    }
+
+    public String getChild() {
+        return childId;
+    }
+
+    
+    protected boolean fetched = false;
+    protected void fetchIfNeeded() {
+        if (fetched)
+            return;
+		try {
+			Tug<M> tug = TugFactory.getTug((Class<M>)Class.forName(modelId));
+			List<M> list = tug.fetch(this);
+	        this.addAll(list);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}        
+
+        fetched = true;
+    }
+
+    ////////// Overwrite ArrayList methods to allow lazy behavior. //////////
+	@Override     // In case a developer may want to take a look in debug.
+	public String toString() {
+		fetchIfNeeded();
+		return super.toString();
 	}
 
 	@Override
 	public int size() {
-		populate();
+		fetchIfNeeded();
 		return super.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		populate();
+		fetchIfNeeded();
 		return super.isEmpty();
 	}
 
 	@Override
 	public boolean contains(Object o) {
-		populate();
+		fetchIfNeeded();
 		return super.contains(o);
 	}
 
 	@Override
 	public Iterator<M> iterator() {
-		populate();
+		fetchIfNeeded();
 		return super.iterator();
 	}
 
 	@Override
 	public Object[] toArray() {
-		populate();
+		fetchIfNeeded();
 		return super.toArray();
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a) {
-		populate();
+		fetchIfNeeded();
 		return super.toArray(a);
 	}
 
 	@Override
 	public M get(int index) {
-		populate();
+		fetchIfNeeded();
 		return super.get(index);
 	}
 
 	@Override
 	public void sort(Comparator<? super M> c) {
-		populate();
+		fetchIfNeeded();
 		super.sort(c);
 	}
 
 	@Override
 	public int indexOf(Object o) {
-		populate();
+		fetchIfNeeded();
 		return super.indexOf(o);
 	}
 
 	@Override
 	public int lastIndexOf(Object o) {
-		populate();
+		fetchIfNeeded();
 		return super.lastIndexOf(o);
 	}
 
 	@Override
 	public ListIterator<M> listIterator() {
-		populate();
+		fetchIfNeeded();
 		return super.listIterator();
 	}
 
 	@Override
 	public ListIterator<M> listIterator(int index) {
-		populate();
+		fetchIfNeeded();
 		return super.listIterator(index);
 	}
 
 	@Override
 	public List<M> subList(int fromIndex, int toIndex) {
-		populate();
+		fetchIfNeeded();
 		return super.subList(fromIndex, toIndex);
 	}
 

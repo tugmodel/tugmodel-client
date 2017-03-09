@@ -21,6 +21,6 @@ import com.tugmodel.client.tug.BaseTug;
  *
  *
  */
-public class WorkflowTug<M extends Model<?>> extends BaseTug<M> {
+public class WorkflowTug<M extends Model> extends BaseTug<M> {
 	
 }

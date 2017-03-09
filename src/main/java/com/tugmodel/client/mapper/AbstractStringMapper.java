@@ -20,7 +20,7 @@ import com.tugmodel.client.model.Model;
  * 
  *
  */
-public abstract class AbstractStringMapper<M extends Model<?>> implements Mapper<M> {
+public abstract class AbstractStringMapper<M extends Model> implements Mapper<M> {
 
 	private Object notImplementedException() {
 		throw new RuntimeException("You need to implement the inherited Mapper method.");

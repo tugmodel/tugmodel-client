@@ -70,30 +70,28 @@ public class MetaTug extends BaseTug<Meta> {
 	}
 	
 	@Override
-    public List<Meta> fetchAll() {
-		loadMeta();		
-		
-		return new ArrayList(metas.values());
-    }
-	
-	public Meta fetchById(String id) {
+	public List<Meta> fetch(ModelList<Meta> query) {		
 		loadMeta();
 		
-		return metas.get(id);		
-	}
-	
-	public ModelList<Meta> where(String query, Object... params) {
-		ModelList<Meta> list = new ModelList();
 		
+		List<Meta> list = new ArrayList<Meta>(metas.values());
+		if (query.getLimit() == 1) {
+			return list.subList(0, 1);
+		} 
+		if (query.getLimit() == 0) {
+			return list;
+		}
 		// TODO: Need a parser, predicate tool.
 		// https://www.google.ro/search?q=sql+parser&oq=sql+parser&aqs=chrome..69i57j0l5.1519j0j4&sourceid=chrome&ie=UTF-8#q=sql+java+parser&*
-		String splits[] = query.split("=");
-		
-		for (Meta meta : metas.values()) {
-			if (meta.get(splits[0]).equals(params[0])) {
-				list.add(meta);
+		String splits[] = query.getWhere().split("=");
+		List<Meta> res= new ArrayList<Meta>();
+		for (Meta meta : list) {
+			if (meta.get(splits[0]).equals(query.getParams()[0])) {
+				res.add(meta);
 			}
+			
 		}
-		return list;
+		return res;
 	}
+	
 }

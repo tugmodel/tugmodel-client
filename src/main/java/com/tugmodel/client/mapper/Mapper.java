@@ -22,7 +22,7 @@ import com.tugmodel.client.model.Model;
  * 
  * TODO: Must remove some methods.
  */
-public interface Mapper<M extends Model<?>> {
+public interface Mapper<M extends Model> {
 	
 //	public Mapper<M> setModelClass(Class<M> modelClass);
 //	public Class<M> getModelClass();

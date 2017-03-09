@@ -23,7 +23,7 @@ import com.tugmodel.client.model.Model;
  *  
  * new FileConfig().setPath("config/tm-config.json").fetch().get("tugs") 
  */
-public class TugConfig<M extends Model<?>> extends Model<M> {	
+public class TugConfig<M extends Model> extends Model<M> {	
 	protected Mapper<M> mapper;	
 
 	public TugConfig() {	
@@ -53,11 +53,11 @@ public class TugConfig<M extends Model<?>> extends Model<M> {
 		return this;
 	}
 	
-	public Class<? extends Model<?>> getModelClass() {
+	public Class<? extends Model> getModelClass() {
 		String id = asString("modelId");
 //		Meta<Meta<?>>.s.get
 		try {
-			return (Class<? extends Model<?>>)Class.forName(id);
+			return (Class<? extends Model>)Class.forName(id);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}

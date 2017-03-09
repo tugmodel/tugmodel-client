@@ -80,7 +80,7 @@ public class TugFactory {
 		
 	}
 	
-	public static <M extends Model<?>> Tug<M> getTug(Class<M> modelClass) {
+	public static <M extends Model> Tug<M> getTug(Class<M> modelClass) {
 		
 		Tug<M> tug = getNearestTug(modelClass);
 
@@ -102,7 +102,7 @@ public class TugFactory {
 		return CONFIG;
 	}
 	
-	protected static <M extends Model<?>> Tug<M> getNearestTug(Class<M> mClass) {
+	protected static <M extends Model> Tug<M> getNearestTug(Class<M> mClass) {
 		String modelClass = mClass.getCanonicalName();
 		String tugId = MODEL_TO_TUG_ID.get(modelClass);
 		if (tugId != null) {
@@ -137,7 +137,7 @@ public class TugFactory {
 				Model tugModel = config.getTugsConfig().tugsAsMap().get(tugId);
 				tug = (Tug)Class.forName(tugModel.asString("class")).newInstance();
 				Model mapper = config.getTugsConfig().mappersAsMap().get(tugModel.asString("mapperId"));
-				TugConfig tc = new TugConfig(mapper);				
+				TugConfig tc = new TugConfig(tugModel);				
 				tug.setConfig(tc);
 				TUG_ID_TO_TUG_INSTANCE.put(tugId, tug);
 			} catch (Exception e) {

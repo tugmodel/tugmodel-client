@@ -25,7 +25,7 @@ import com.tugmodel.client.model.config.TugConfig;
  * A tug is not a model because it contains business logic code. Instead the configuration for a Tug is a model.
  * 
  */
-public interface Tug<M extends Model<?>> {
+public interface Tug<M extends Model> {
 
 	public TugConfig<M> getConfig();
 	
@@ -42,9 +42,11 @@ public interface Tug<M extends Model<?>> {
     public M update(M model);
 
     public M delete(M model);
-
+    
+    public <C extends Model> List<C> add(M model, List<C> childs);
+    
     // This method is for custom business API (SPI).
-    public M run(String operation, List<Object> params);
+    public Object run(String operation, List<Object> params);
 
 	
 	//////////////////////////////////////////////////////////////////////
@@ -56,13 +58,20 @@ public interface Tug<M extends Model<?>> {
 
     public M fetchFirst();
 
-    // ModelList is a lazy active list.
-    public List<M> fetchAll();
-    
-    // Provide a complete query. E.g. "select * from ...".
-    public ModelList<M> fetchByQuery(String query, Object... params);
+    // ModelList is a lazy active list. Use with care since there may be many elements returned.
+    public ModelList<M> fetchAll();
 
     public ModelList<M> where(String query, Object... params);
+    
+    public <C extends Model> ModelList<C> where(Class<C> child, String query, Object... params);
+
+    // This sends the lazylist params(no elements) and receive a raw list with the values.
+    public List<M> fetch(ModelList<M> query);
+
+    // Provide a complete query. E.g. "select * from ...". This should return the results in front.
+    public <C extends Model> List<C> fetchByRawQuery(Class<C> c, String query, Object... params);
+
+    
 
 
 

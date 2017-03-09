@@ -28,7 +28,7 @@ import com.tugmodel.client.tug.BaseTug;
 /**
  * Wrapper tug used for stuff like error handling and delegation to proxied tug.
  */
-public class SQLTug<M extends Model<?>> extends BaseTug<M> {
+public class SQLTug<M extends Model> extends BaseTug<M> {
 
 	
 //	private createMisingTable(M model, Meta meta) {

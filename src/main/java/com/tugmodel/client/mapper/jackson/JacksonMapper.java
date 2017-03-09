@@ -27,7 +27,7 @@ import com.tugmodel.client.model.Model;
  * Mapper implementation using Jackson. TODO: Configure Mapper via a
  * tm-mapper-defaults.json file under resources/config/.
  */
-public abstract class JacksonMapper<M extends Model<?>> extends AbstractStringMapper<M> {
+public abstract class JacksonMapper<M extends Model> extends AbstractStringMapper<M> {
 	protected ObjectMapper mapper;
 		
 	public abstract ObjectMapper initMapper();

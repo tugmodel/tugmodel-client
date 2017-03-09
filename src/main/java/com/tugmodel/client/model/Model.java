@@ -68,7 +68,7 @@ import com.tugmodel.client.util.ReflectionUtil;
  * 
  * 
  */
-public class Model<M extends Model<?>> {	
+public class Model<M extends Model> {	
 	public static String ID = "id";   // Should be externalized in properties file.
 
 	protected boolean isNew = false;   // This model has not been fetched.
@@ -191,6 +191,7 @@ public class Model<M extends Model<?>> {
     	
     	M m = tug().fetch((M)this);
     	isNew = false;
+    	this.data = m.data(); // Save the content.
     	return m;
     }
     
@@ -213,11 +214,17 @@ public class Model<M extends Model<?>> {
      * @param operation
      * @return
      */
-    public M run(String operation, List<Object> params) {    	
+    public Object run(String operation, List<Object> params) {    	
     	return tug().run(operation, params);
     }
     
-    
+    /**
+     * One to many.
+     */
+    public void add(Model child) {
+    	List list = tug().add((M)this, Collections.singletonList(child));
+    }
+
     // Use only for pretty print.
     @Override
     public String toString() {

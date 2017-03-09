@@ -23,7 +23,7 @@ import com.tugmodel.client.model.config.TugConfig;
 /**
  * You can use this as base class when implementing tugs.
  */
-public class BaseTug<M extends Model<?>> implements Tug<M> {
+public class BaseTug<M extends Model> implements Tug<M> {
 	// Should it be part of the config defaults?.
 //	public static final Mapper PRETTY_PRINT_MAPPER = new JacksonMapper<Model>(); 
 	protected TugConfig<M> config = new TugConfig<M>();
@@ -60,34 +60,50 @@ public class BaseTug<M extends Model<?>> implements Tug<M> {
 		return (M)notImplementedException();
     }
 	
-	public M run(String operation, List<Object> params) {
-		// TODO Auto-generated method stub
-		return null;
+    public <C extends Model> List<C> add(M model, List<C> childs) {
+    	return (List<C>)notImplementedException();
+    }
+    
+	public Object run(String operation, List<Object> params) {
+		return notImplementedException();
 	}	
 		
+	protected String modelId() {
+		//return getConfig().asString("modelId");
+		return getConfig().getModelClass().getCanonicalName();
+	}
 	// Additional parameters provided for sending authorization token.	
     public M fetchById(String id) {
-    	return (M)notImplementedException();
+    	ModelList<M> list = new ModelList<M>().where("id=?", id).modelId(modelId());
+    	return list.size() == 0 ? null : list.get(0);
     }    
 	
-    // A lazy list similar to the one in JavaLite.
-    public ModelList<M> where(String query, Object... params) {
-    	return (ModelList<M>)notImplementedException();
-    }
-
-	@Override
 	public M fetchFirst() {
-		return (M)notImplementedException();
+		List<M> res = fetch(new ModelList<M>().limit(1).modelId(modelId()));
+		return res.size() == 0 ? null : res.get(0);
 	}
 
-	@Override
-	public List<M> fetchAll() {
-		return (ModelList<M>)notImplementedException();
+	public ModelList<M> fetchAll() {
+    	ModelList<M> list = new ModelList<M>().where("").modelId(modelId());
+    	return list;
 	}
 
-	@Override
-	public ModelList<M> fetchByQuery(String query, Object... params) {
-		return (ModelList<M>)notImplementedException();
+	public List<M> fetch(ModelList<M> query) {
+		return (List<M>)notImplementedException();
 	}
 
+	public ModelList<M> where(String query, Object... params) {
+    	ModelList<M> list = new ModelList<M>().where(query).params(params).modelId(modelId());
+    	return list;
+	}
+
+	public <C extends Model> ModelList<C> where(Class<C> child, String query, Object... params) {
+    	ModelList<C> list = 
+    			new ModelList().child(child.getCanonicalName()).where(query).params(params).modelId(modelId());
+    	return list;
+	}
+
+	public <C extends Model> List<C> fetchByRawQuery(Class<C> c, String query, Object... params) {
+		return (List<C>)notImplementedException();
+	}
 }

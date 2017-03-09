@@ -12,21 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.tug.storage;
-
-import java.io.File;
+package com.tugmodel.client.model.meta;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.BaseTug;
 
 /**
  * 
  *
  */
-public class FileTug<M extends Model> extends BaseTug<M> {
-	protected File folder;
-	
+public class StringDT<DT extends StringDT> extends Model<DT> {
+	    
 
-
-	
 }
