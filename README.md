@@ -164,7 +164,16 @@ The solution is to add an `install tug`. Use JSON seeds as input to the `install
 A JSON operation marking scheme is used here and could be similar to JSON-PATCH or [JSON-API](http://jsonapi.org/).
 
 ##Other ideas:
-  * TODO: add ModelException and TugException classes. 
+  * TODO: add JavaScript API that uses REST to call model operations.
+    This is [REST level 2](https://martinfowler.com/articles/richardsonMaturityModel.html).
+    The REST controller will call directly the corresponding tug.
+    The JavaScript API will directly follow the Model class API. Similar to backbone.js. 
+    Also consider not implementing the JS API and using entirely backbone.js and just provide a REST controller.
+```JavaScript
+var model = new Model().setId("x").fetch();
+
+``` 
+  * TODO: add ModelException and TugException classes.   
   * **GUI web app** for `tug` (simple workflow) configuration and stats reports.  
   * [JSON-API](http://jsonapi.org/) proxy implementation.
   * Integrate a [free](https://github.com/Activiti) or develop a complex workflow [BPMN](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation) as alternative to `tugmodel` simple workflow. 
