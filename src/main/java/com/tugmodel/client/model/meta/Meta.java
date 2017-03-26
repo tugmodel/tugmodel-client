@@ -14,7 +14,6 @@
  */
 package com.tugmodel.client.model.meta;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,50 +22,41 @@ import com.tugmodel.client.model.Model;
 import com.tugmodel.client.tug.Tug;
 import com.tugmodel.client.tug.TugFactory;
 
+
 /**
- * Metadata model.
+ * Base Meta model that describes simple models where each model has a list of attribute and each attribute has several
+ * properties(e.g. datatype).
  */
 public class Meta extends Model<Meta> {
-	public static final Tug<Meta> s = TugFactory.get(Meta.class); 
-	
-	public String getDescription() {
-		return asString("description");
-	}
-	
-	public Meta setDescription(String description) {
-		return set("description", description);
-	}
-	
-	public Class<?> modelClass() {
-		try {
-			return Class.forName(asString("class"));
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-//	// Shortcut method.
-//	public Attribute attr(String id) {
-//		for (Attribute attr : getAttributes()) {  // TODO: cache some map?.
-//			if (id.equals(attr.getId()))
-//				return attr;
-//		}
-//		return null;
-//	}
-	
-	public Map<String, Attribute> attrMap() {
-		Map<String, Attribute> map = new HashMap();
-		for (Attribute attr : getAttributes()) {
-			map.put(attr.getId(), attr);
-		}
-		return map;
-	}
-	
+    // Avoids instrumentation and the need of duplicating static methods on each model class.
+    public static final Tug<Meta> s = TugFactory.get(Meta.class);
+
+    /**
+     * Returns the attributes. Necessary in order to promote the type information.
+     */
     public List<Attribute> getAttributes() {
-         return get("attributes", new ArrayList<Attribute>());
+        return (List<Attribute>) get("attributes");
     }
 
     public Meta setAttributes(List<Attribute> value) {
         return set("attributes", value);
     }
+
+    public Class<?> modelClass() {
+        try {
+            return Class.forName(asString("class"));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    // Shortcut.
+    public Map<String, Attribute> attrMap() {
+        Map<String, Attribute> map = new HashMap<String, Attribute>();
+        for (Attribute attr : getAttributes()) {
+            map.put(attr.getId(), attr);
+        }
+        return map;
+    }
+
 }

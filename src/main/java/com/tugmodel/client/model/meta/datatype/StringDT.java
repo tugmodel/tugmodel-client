@@ -12,19 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.meta;
-
-import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.Tug;
-import com.tugmodel.client.tug.TugFactory;
+package com.tugmodel.client.model.meta.datatype;
 
 /**
  * 
  *
  */
-public class DataType<DT extends DataType> extends Model<DT> {
-	// Tug over default datatypes.
-	public static final Tug<DataType> s = TugFactory.get(DataType.class);
+public class StringDT extends DataType<StringDT> {
 	    
 
 }

@@ -14,33 +14,20 @@
  */
 package com.tugmodel.client.model.meta;
 
-import com.tugmodel.client.mapper.Mapper;
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.model.config.Config;
-import com.tugmodel.client.tug.TugFactory;
+import com.tugmodel.client.model.meta.datatype.DataType;
 
 /**
  * 
- *
  */
 public class Attribute extends Model<Attribute> {
 
-	
-	
-	public DataType getDataType() {
-		return get("dataType", DataType.class);
-	}
+    public DataType getDataType() {
+        return (DataType) get("dataType");
+    }
 
-	// When saving datatype a merging is done using the default datatypes.
-	public Attribute setDataType(DataType dt) {
-//		Config config = new Config().fetch();
-//	    // Use the Model copy constructor or use the mapper. Let's try the mapper.
-//		Mapper mapper = TugFactory.get(DataType.class).getConfig().getMapper();
-//		Model defaultDTModel = config.getMetadataConfig().dataTypeAsMap().get(dt.getId());
-//		if (defaultDTModel != null) {
-//			DataType defaultDT = (DataType)mapper.convert(defaultDTModel, DataType.class);
-//			mapper.updateModel(defaultDT.toString(), dt);
-//		}
-		return this;
-	}
+    public Attribute setDataType(DataType value) {
+        return set("dataType", value);
+    }
+
 }

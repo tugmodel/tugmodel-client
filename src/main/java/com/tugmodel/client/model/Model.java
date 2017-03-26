@@ -76,7 +76,7 @@ import com.tugmodel.client.util.ReflectionUtil;
 public class Model<M extends Model> {	
     public static final String KEY_ID = "id";
     public static final String KEY_VERSION = "version";
-    public static final String KEY_CLASS = "@c";
+    public static final String KEY_TENANT = "tenant";
     protected boolean usesMeta = false;   // If meta should be used when obtaining extra attributes or just reflection.
     protected Map<String, Object> data = Collections.synchronizedMap(new LinkedHashMap<String, Object>());
 
