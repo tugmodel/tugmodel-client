@@ -5,7 +5,7 @@
 Tugmodel is a tugged(active) POJO framework, metadata framework, domain model keeper, service orchestrator, SQL/NoSQL ORM, distributed service framework, **do it yourself framework**. 
 
 It has 3 concepts: **TUGS, MODELS and METADATA**.
-  1. **A tug** can be a task, workflow, comunication mean, storage mean, processing mean, etc. Basically it is a service abstraction interface used to **drive(tug)**, transport or process the models. Inspired by BPMN activities.
+  1. **A tug** can be a task, workflow, communication mean, storage mean, processing mean, interface, etc. Basically it is a service abstraction interface used to **drive(tug)**, transport or process the models. Inspired by BPMN activities.
   2. **A model** is an **active POJO** that stores the data processed by the tugs. 
   3. **A metadata** is also a model but it stores descriptive, structural and administrative information about a model that keeps real data.
 You can/should **plug in your own tugs, your own models and your own metadata**. Default implementations are provided mainly for reference and basic functionality.

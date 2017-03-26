@@ -22,7 +22,7 @@ import com.tugmodel.client.tug.TugFactory;
  * Clasical Oracle example.
  */
 public class Employee extends Model<Employee> {
-	public static final Tug<Employee> s = TugFactory.getTug(Employee.class); 
+	public static final Tug<Employee> s = TugFactory.get(Employee.class); 
 	
 	
 	public String getName() {

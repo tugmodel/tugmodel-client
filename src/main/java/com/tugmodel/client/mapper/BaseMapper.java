@@ -17,10 +17,9 @@ package com.tugmodel.client.mapper;
 import com.tugmodel.client.model.Model;
 
 /**
- * 
- *
+ * Base mapper used when creating custom mappers.
  */
-public abstract class AbstractStringMapper<M extends Model> implements Mapper<M> {
+public class BaseMapper<M extends Model> implements Mapper<M> {
 
 	private Object notImplementedException() {
 		throw new RuntimeException("You need to implement the inherited Mapper method.");
@@ -45,6 +44,5 @@ public abstract class AbstractStringMapper<M extends Model> implements Mapper<M>
 	public String toPrettyString(Object fromValue) {
 		return (String) notImplementedException();
 	}
-
 
 }

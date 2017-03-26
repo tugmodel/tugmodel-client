@@ -106,4 +106,22 @@ public class BaseTug<M extends Model> implements Tug<M> {
 	public <C extends Model> List<C> fetchByRawQuery(Class<C> c, String query, Object... params) {
 		return (List<C>)notImplementedException();
 	}
+
+	@Override
+	public void transactionStart() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void trasactionCommit() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void trasactionRollback() {
+		// TODO Auto-generated method stub
+		
+	}
 }

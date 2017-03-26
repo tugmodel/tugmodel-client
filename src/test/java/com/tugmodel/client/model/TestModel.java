@@ -14,8 +14,12 @@
  */
 package com.tugmodel.client.model;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.List;
+
+import org.junit.Test;
 
 import com.tugmodel.client.model.config.Config;
 import com.tugmodel.client.model.meta.Meta;
@@ -47,14 +51,43 @@ public class TestModel {
 
 		List<Meta> metas = Meta.s.fetchAll();
 		Meta modelMeta = Meta.s.fetchById("Model");
-		
-		
-		
-
 				
 		System.out.println("aaaaaa");
-		
-
-		
 	}
+    
+    
+    @Test
+    public void modelSetter() {
+        assertTrue(new Model().set("a", 1).asInteger("a") == 1);
+    }
+
+    
+    private static class XModel extends Model<XModel> {
+        public int getX() {
+            return asInteger("x");
+        }
+        public XModel setX(int val) {
+            return set("x", 1);
+        }
+    };
+
+    @Test
+    public void nullValueSupport() {
+        assertTrue(new Model().set("a", null).contains("a") == true);
+        assertTrue(new Model().set("a", null).contains("b") == false);
+        assertTrue(new Model().set("a", null).get("a") == null);        
+    }
+    
+    @Test
+    public void modelExtraAttributesUsingReflection() {
+        XModel m = new XModel();
+        m.set("y", 0);
+        m.setX(1);
+        
+        assertTrue(m.getX() == 1);
+        assertTrue(m.getExtraAttributes().size() == 1);
+        assertTrue(((Integer)m.getExtraAttributes().get("y")) == 0);
+        
+    }
+
 }

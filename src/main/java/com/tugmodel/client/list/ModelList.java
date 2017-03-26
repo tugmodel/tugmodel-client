@@ -147,7 +147,7 @@ public class ModelList<M extends Model> extends ArrayList<M> {
         if (fetched)
             return;
 		try {
-			Tug<M> tug = TugFactory.getTug((Class<M>)Class.forName(modelId));
+			Tug<M> tug = TugFactory.get((Class<M>)Class.forName(modelId));
 			List<M> list = tug.fetch(this);
 	        this.addAll(list);
 		} catch (ClassNotFoundException e) {

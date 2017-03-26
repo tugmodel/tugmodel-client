@@ -24,9 +24,6 @@ import com.tugmodel.client.model.Model;
  */
 public interface Mapper<M extends Model> {
 	
-//	public Mapper<M> setModelClass(Class<M> modelClass);
-//	public Class<M> getModelClass();
-	
 	/**
 	 * Converts into RAW data that is suitable for communication.  
 	 * TODO: Leave only convert method and remove the M type parameter.
@@ -38,7 +35,7 @@ public interface Mapper<M extends Model> {
 	public void updateModel(Object fromValue, M toModel);
 	
 	/**
-	 * Jackson case, 2 step conversion: Writing a POJO as JSON, and second, binding that JSON into another kind of POJO.
+	 * E.g. Jackson, 2 step conversion: Writing a POJO as JSON, and second, binding that JSON into another kind of POJO.
 	 */
 	public <T> T convert(Object fromValue, Class<T> toValueType);
 		
