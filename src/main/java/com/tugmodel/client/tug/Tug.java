@@ -24,8 +24,8 @@ import com.tugmodel.client.model.config.TugConfig;
 @SuppressWarnings("rawtypes")
 public interface Tug<TUG extends Tug> {
 
-	public TugConfig getConfig();
-	
-	public TUG setConfig(TugConfig config);
+    public TugConfig getConfig();
+
+    public TUG setConfig(TugConfig config);
 	
 }

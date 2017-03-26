@@ -24,6 +24,7 @@ import com.tugmodel.client.model.Model;
  * 		 static Tug<MyModel> s = TugFactory.s.where("id=factory1").getTug(modelClass).
  * 
  */
+@SuppressWarnings("all")
 public class TugFactory {
 	
 //	// Using pair maps allows for lazy initialization of tugs and model classes.
@@ -145,11 +146,21 @@ public class TugFactory {
 	 * Returns a CrudTug.
 	 * @param modelClass
 	 * @return
-	 */
-	public static <M extends Model> CrudTug<M> getCrud(Class<M> modelClass) {
-		return (CrudTug<M>)null;
-	}
-	public static <M extends Model> Tug get(Class<M> modelClass) {
-		return (Tug)null;
-	}
+	 */	
+    public static <M extends Model> CrudTug<M> getCrud(Class<M> modelClass) {
+        if (modelClass == Model.class) {
+            try {
+                // Temporary.
+                return (CrudTug) Class.forName("com.tugmodel.tug.file.FolderBasedTug").newInstance();
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return (CrudTug<M>) null;
+    }
+
+    public static <M extends Model> Tug get(Class<M> modelClass) {
+        return (Tug) null;
+    }
 }
