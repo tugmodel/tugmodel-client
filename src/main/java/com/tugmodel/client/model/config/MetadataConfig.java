@@ -24,6 +24,7 @@ import com.tugmodel.client.model.Model;
  * Configuration files.
  *  
  */
+@SuppressWarnings("all")
 public class MetadataConfig extends Model<MetadataConfig> {
 
 	

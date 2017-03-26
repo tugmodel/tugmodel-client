@@ -16,7 +16,7 @@ package com.tugmodel.client.model.config;
 
 import com.tugmodel.client.mapper.Mapper;
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
 import com.tugmodel.client.util.ReflectionUtil;
 
@@ -25,9 +25,10 @@ import com.tugmodel.client.util.ReflectionUtil;
  * When a tug specifies a mapper it refers to an existing mapper. The tug can also provide custom properties
  * that overwrite the default mapper properties within the model served by MapperConfig.   
  */
+@SuppressWarnings("all")
 public class MapperConfig<M extends MapperConfig> extends Model<M> {
     // This tug returns the list of possible mappers.
-    public static final Tug<MapperConfig> s = TugFactory.get(MapperConfig.class);
+    public static final CrudTug<MapperConfig> s = TugFactory.getCrud(MapperConfig.class);
 
     /**
      * Creates/returns a mapper from the MapperConfig. 
@@ -35,8 +36,9 @@ public class MapperConfig<M extends MapperConfig> extends Model<M> {
      *   1. Create CustomMapperConfig class that extends this class and overwrites "mapper" method.
      *   2. Extend/implement a custom tug for serving CustomMapperConfig instances.  
      */
-    public Mapper mapper() {
-        MapperConfig mapper = MapperConfig.s.fetchById(asString(Model.KEY_ID));
+    @SuppressWarnings("unchecked")
+    public Mapper<M> mapper() {
+        MapperConfig<M> mapper = MapperConfig.s.fetchById(asString(Model.KEY_ID));
         mapper.merge(this); // Merge over default mapper.
 
         return ReflectionUtil.createInstance(mapper, Mapper.class);

@@ -23,14 +23,15 @@ import com.tugmodel.client.model.list.ModelList;
 /**
  * You can use this as base class when implementing tugs.
  */
-public class BaseTug<M extends Model> implements Tug<M> {
+@SuppressWarnings("all")
+public class BaseCrudTug<M extends Model> implements CrudTug<M> {
 	protected TugConfig config = new TugConfig();
 	
 	public TugConfig getConfig() {
 		return config;
 	}
 	
-	public Tug<M> setConfig(TugConfig config) {
+	public CrudTug<M> setConfig(TugConfig config) {
 		this.config = config;
 		return this;
 	}

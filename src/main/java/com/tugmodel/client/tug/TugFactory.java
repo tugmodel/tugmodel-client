@@ -141,7 +141,15 @@ public class TugFactory {
 //		return tug;
 //	}
 	
-	public static <M extends Model> Tug<M> get(Class<M> modelClass) {
-		return (Tug<M>)null;
+	/**
+	 * Returns a CrudTug.
+	 * @param modelClass
+	 * @return
+	 */
+	public static <M extends Model> CrudTug<M> getCrud(Class<M> modelClass) {
+		return (CrudTug<M>)null;
+	}
+	public static <M extends Model> Tug get(Class<M> modelClass) {
+		return (Tug)null;
 	}
 }

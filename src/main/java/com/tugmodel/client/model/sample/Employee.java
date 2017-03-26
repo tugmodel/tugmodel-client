@@ -15,14 +15,14 @@
 package com.tugmodel.client.model.sample;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
 
 /**
  * Clasical Oracle example.
  */
 public class Employee extends Model<Employee> {
-	public static final Tug<Employee> s = TugFactory.get(Employee.class); 
+	public static final CrudTug<Employee> s = TugFactory.getCrud(Employee.class); 
 	
 	
 	public String getName() {

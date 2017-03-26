@@ -20,6 +20,7 @@ import com.tugmodel.client.model.meta.datatype.DataType;
 /**
  * 
  */
+@SuppressWarnings("all")
 public class Attribute extends Model<Attribute> {
 
     public DataType getDataType() {

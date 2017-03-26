@@ -14,18 +14,10 @@
  */
 package com.tugmodel.client.tug;
 
-import com.tugmodel.client.model.config.TugConfig;
-
 /**
- * Base interface off all tugs.
- * A tug can serve one or more model types. 
- * A tug is not a model because it contains business logic code. Instead the configuration for a Tug is a model.
+ * A business tug can contain ANY methods and is not restricted to one model like CrudTug.
  */
 @SuppressWarnings("rawtypes")
-public interface Tug<TUG extends Tug> {
-
-	public TugConfig getConfig();
-	
-	public TUG setConfig(TugConfig config);
-	
+public interface BusinessTug extends Tug<BusinessTug> {
+	    
 }

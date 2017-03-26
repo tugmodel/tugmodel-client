@@ -19,6 +19,7 @@ import com.tugmodel.client.model.Model;
 /**
  * Basic configuration of the entire tugmodel system. 
  */
+@SuppressWarnings("all")
 public class Config<M extends Config> extends Model<M> {
     public static final String KEY_METADATA = "metadata";
     public static final String KEY_TUGS = "tugs";

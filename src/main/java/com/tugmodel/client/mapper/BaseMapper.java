@@ -19,6 +19,7 @@ import com.tugmodel.client.model.Model;
 /**
  * Base mapper used when creating custom mappers.
  */
+@SuppressWarnings("all")
 public class BaseMapper<M extends Model> implements Mapper<M> {
 
 	private Object notImplementedException() {

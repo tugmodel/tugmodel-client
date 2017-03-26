@@ -28,7 +28,7 @@ import java.util.UUID;
 
 import com.tugmodel.client.model.meta.Attribute;
 import com.tugmodel.client.model.meta.Meta;
-import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
 import com.tugmodel.client.util.ModelUtil;
 import com.tugmodel.client.util.ReflectionUtil;
@@ -73,6 +73,7 @@ import com.tugmodel.client.util.ReflectionUtil;
  * 
  * 
  */
+@SuppressWarnings("all")  // Or add one by one @SuppressWarnings("rawtypes")  @SuppressWarnings("unchecked")
 public class Model<M extends Model> {	
     public static final String KEY_ID = "id";
     public static final String KEY_VERSION = "version";
@@ -214,8 +215,8 @@ public class Model<M extends Model> {
     }
 
     // No get in front to not hide a potential field with same name.
-    protected Tug<M> tug() {
-        return TugFactory.get((Class<M>) this.getClass());
+    protected CrudTug<M> tug() {
+        return TugFactory.getCrud((Class<M>) this.getClass());
     }
 
     public M fetch() {

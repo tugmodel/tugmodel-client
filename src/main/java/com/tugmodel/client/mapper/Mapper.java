@@ -22,13 +22,14 @@ import com.tugmodel.client.model.Model;
  * 
  * TODO: Must remove some methods.
  */
+@SuppressWarnings("rawtypes")
 public interface Mapper<M extends Model> {
 	
 	/**
 	 * Converts into RAW data that is suitable for communication.  
 	 * TODO: Leave only convert method and remove the M type parameter.
 	 */
-	public Object serialize(M fromModel); 
+	public abstract Object serialize(M fromModel); 
 	
 	public M deserialize(Object fromValue);
 
@@ -36,12 +37,15 @@ public interface Mapper<M extends Model> {
 	
 	/**
 	 * E.g. Jackson, 2 step conversion: Writing a POJO as JSON, and second, binding that JSON into another kind of POJO.
+	 * When using also provide type parameter, ((Mapper<Model>) mapper).convert.
 	 */
-	public <T> T convert(Object fromValue, Class<T> toValueType);
-		
+    public <T> T convert(Object fromValue, Class<T> toValueType);
+	
+    
 	/**
 	 * Used in debug/development mode to have access to a pretty print of the actual model or object. 
 	 */
 	public String toPrettyString(Object fromValue);
+	
 	
 }

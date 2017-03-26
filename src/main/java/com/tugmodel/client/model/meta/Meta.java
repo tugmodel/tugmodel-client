@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
 
 
@@ -29,11 +29,12 @@ import com.tugmodel.client.tug.TugFactory;
  */
 public class Meta extends Model<Meta> {
     // Avoids instrumentation and the need of duplicating static methods on each model class.
-    public static final Tug<Meta> s = TugFactory.get(Meta.class);
+    public static final CrudTug<Meta> s = TugFactory.getCrud(Meta.class);
 
     /**
      * Returns the attributes. Necessary in order to promote the type information.
      */
+    @SuppressWarnings("all")
     public List<Attribute> getAttributes() {
         return (List<Attribute>) get("attributes");
     }

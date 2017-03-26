@@ -15,16 +15,17 @@
 package com.tugmodel.client.model.meta.datatype;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
 
 /**
  * Same DataType can be shared by multiple attributes. 
  * The datatype reference by an attribute can provide overwrites for that datatype so a new instance is created. 
  */
+@SuppressWarnings("all")
 public class DataType<DT extends DataType<?>> extends Model<DT> {
     // Assuming datatypes can be shared by multiple attributes.
-    public static final Tug<DataType> s = TugFactory.get(DataType.class);
+    public static final CrudTug<DataType> s = TugFactory.getCrud(DataType.class);
 
     // If the datatype is a list of models.
     public boolean isOneToMany() {

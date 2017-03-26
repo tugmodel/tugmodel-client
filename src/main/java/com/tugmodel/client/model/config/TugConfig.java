@@ -20,7 +20,8 @@ import com.tugmodel.client.model.Model;
 /**
  *  
  */
-public class TugConfig<M extends TugConfig> extends Model<M> {
+@SuppressWarnings("all")
+public class TugConfig extends Model<TugConfig> {
 
     public static final String KEY_MAPPER = "mapper";
     public static final String KEY_CACHED_MAPPER = "cachedMapper";
@@ -28,7 +29,7 @@ public class TugConfig<M extends TugConfig> extends Model<M> {
     /**
      * Returns cached mapper. If you do not need the cache then do getMapper().mapper(). 
      */
-    public Mapper<M> mapper() {
+    public Mapper<Model> mapper() {
         Mapper mapper = get(KEY_CACHED_MAPPER, Mapper.class);
         if (mapper == null) {
             mapper = getMapper().mapper();

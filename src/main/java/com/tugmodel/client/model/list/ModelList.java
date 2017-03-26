@@ -22,13 +22,14 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.Tug;
+import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
 
 /**
  * Lazy list used when querying data.
  * A list is driven by a tug also indirectly via the tug assigned to the model. 
  */
+@SuppressWarnings("all")
 public class ModelList<M extends Model> extends ArrayList<M> {
 	private static final long serialVersionUID = 1L;
 	protected String where = "";
@@ -131,7 +132,7 @@ public class ModelList<M extends Model> extends ArrayList<M> {
         childId = val;
         return this;
     }
-    
+   
     public ModelList<M> child(Class val) {
         childId = val.getCanonicalName();
         return this;
@@ -143,11 +144,12 @@ public class ModelList<M extends Model> extends ArrayList<M> {
 
     
     protected boolean fetched = false;
+    
     protected void fetchIfNeeded() {
         if (fetched)
             return;
 		try {
-			Tug<M> tug = TugFactory.get((Class<M>)Class.forName(modelId));
+			CrudTug<M> tug = TugFactory.getCrud((Class<M>)Class.forName(modelId));
 			List<M> list = tug.fetch(this);
 	        this.addAll(list);
 		} catch (ClassNotFoundException e) {
