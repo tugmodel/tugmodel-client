@@ -2,10 +2,10 @@
 
 #What it is?:
 
-Tugmodel is a tugged(active) POJO framework, metadata framework, domain model keeper, service orchestrator, SQL/NoSQL ORM, distributed service framework, **do it yourself framework**. 
+Tugmodel is a tugged(active) POJO framework, metadata framework, domain model keeper, service orchestrator(BPMN), SQL/NoSQL ORM, distributed service framework, **do it yourself framework**. 
 
 It has 3 concepts: **TUGS, MODELS and METADATA**.
-  1. **A tug** can be a task, workflow, communication mean, storage mean, processing mean, interface, etc. Basically it is a service abstraction interface used to **drive(tug)**, transport or process the models. Inspired by BPMN activities.
+  1. **A tug** can be a task, workflow, communication mean, storage mean, processing mean, interface, etc. Basically it is a service abstraction interface used to **drive(tug)**, transport or process the models.
   2. **A model** is an **active POJO** that stores the data processed by the tugs. 
   3. **A metadata** is also a model but it stores descriptive, structural and administrative information about a model that keeps real data.
 You can/should **plug in your own tugs, your own models and your own metadata**. Default implementations are provided mainly for reference and basic functionality.
@@ -137,7 +137,7 @@ Similar patterns in: Ruby ActiveModel, JavaLite and Backbone.js.
  myObj.save();
  ```
 Instead of doing `MyControlService.save(myObj)` you will do **`myObj.save()`**.
-The benefit is that it allows an abstraction of the operation and transport(e.g. the destination could be a local/remote service or a rest/non rest provider depending on the configured proxy). This is inspired by Martin Fowler's [active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern) and backbonejs.
+The benefit is that it allows an abstraction of the operation and transport(e.g. the destination could be a local/remote service or a rest/non rest provider depending on the configured proxy). This is similar with Martin Fowler's [active record pattern](https://en.wikipedia.org/wiki/Active_record_pattern) with the distinction that the tug(provider) is not known a priori.
 
 #Workflow tug
 Allow simple workflows (called `tugs`). A `tug` is made of tasks. This encourages decoupling each `model/record` action into basic units(tasks) of work, e.g.:

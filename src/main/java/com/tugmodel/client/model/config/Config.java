@@ -17,26 +17,26 @@ package com.tugmodel.client.model.config;
 import com.tugmodel.client.model.Model;
 
 /**
- * Configuration files.
- *  
+ * Basic configuration of the entire tugmodel system. 
  */
-public class Config extends Model<Config> {
-	
-	// Be careful for the method name to match the property in the JSON.
-	public MetadataConfig getMetadataConfig() {
-		return (MetadataConfig) get("metadataConfig");
-	}
-	
-	public Config setMetadataConfig(MetadataConfig mc) {
-		return set("metadataConfig", mc);
-	}
-	
-	public TugsConfig getTugsConfig() {
-		return (TugsConfig) get("tugsConfig");
-	}
-	
-	public Config setTugsConfig(TugsConfig value) {
-		return set("tugsConfig", value);
-	}
+public class Config<M extends Config> extends Model<M> {
+    public static final String KEY_METADATA = "metadata";
+    public static final String KEY_TUGS = "tugs";
 
+    // Be careful for the method name to match the property in the JSON.
+    public Model getMetadata() {
+        return asModel(KEY_METADATA);
+    }
+
+    public Config setMetadata(Model mc) {
+        return set(KEY_METADATA, mc);
+    }
+
+    public Model getTugs() {
+        return asModel(KEY_TUGS);
+    }
+
+    public Config setTugs(Model mc) {
+        return set(KEY_TUGS, mc);
+    }
 }

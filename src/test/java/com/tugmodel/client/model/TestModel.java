@@ -40,19 +40,19 @@ public class TestModel {
 //		Meta meta = new Meta();
 
 				
-		Config config = new Config();
-		
-		
-		System.out.println(config.toString());
-		config = config.fetch();
-		System.out.println(config.toString()); 
-		
-		System.out.println("aaa");
-
-		List<Meta> metas = Meta.s.fetchAll();
-		Meta modelMeta = Meta.s.fetchById("Model");
-				
-		System.out.println("aaaaaa");
+//		Config config = new Config();
+//		
+//		
+//		System.out.println(config.toString());
+//		config = config.fetch();
+//		System.out.println(config.toString()); 
+//		
+//		System.out.println("aaa");
+//
+//		List<Meta> metas = Meta.s.fetchAll();
+//		Meta modelMeta = Meta.s.fetchById("Model");
+//				
+//		System.out.println("aaaaaa");
 	}
     
     

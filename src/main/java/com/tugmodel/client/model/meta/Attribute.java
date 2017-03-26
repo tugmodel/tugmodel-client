@@ -33,14 +33,14 @@ public class Attribute extends Model<Attribute> {
 
 	// When saving datatype a merging is done using the default datatypes.
 	public Attribute setDataType(DataType dt) {
-		Config config = new Config().fetch();
-	    // Use the Model copy constructor or use the mapper. Let's try the mapper.
-		Mapper mapper = TugFactory.get(DataType.class).getConfig().getMapper();
-		Model defaultDTModel = config.getMetadataConfig().dataTypeAsMap().get(dt.getId());
-		if (defaultDTModel != null) {
-			DataType defaultDT = (DataType)mapper.convert(defaultDTModel, DataType.class);
-			mapper.updateModel(defaultDT.toString(), dt);
-		}
+//		Config config = new Config().fetch();
+//	    // Use the Model copy constructor or use the mapper. Let's try the mapper.
+//		Mapper mapper = TugFactory.get(DataType.class).getConfig().getMapper();
+//		Model defaultDTModel = config.getMetadataConfig().dataTypeAsMap().get(dt.getId());
+//		if (defaultDTModel != null) {
+//			DataType defaultDT = (DataType)mapper.convert(defaultDTModel, DataType.class);
+//			mapper.updateModel(defaultDT.toString(), dt);
+//		}
 		return this;
 	}
 }

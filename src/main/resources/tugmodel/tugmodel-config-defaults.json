@@ -1,12 +1,10 @@
 {
-	"note": "Do not modify this file!. Create a file named tm-config.json with you configs. Your file will be merged at runtime over this one.",
+	"note": "Do not modify this file!. Create a file named tugmodel-config.json with you configs. Your file will be merged at runtime over this one.",
 	"id": "defaults",
 	"version": "1.0",	
-	
-	"metadataConfig": {
-		"note": "TODO: Model classes can be generated automatically(freemaker) using default interpreter or your own but is better that you manually maintain them.",
-		"generateClasses": "false",
-		"metadata": [
+	"metadata": {
+	    "note": "TODO: Model classes can be generated automatically(freemaker) using default interpreter or your own but is better that you manually maintain them.",
+		"model": [
 			{
 				"id": "Model",
 				"class": "com.tugmodel.client.model.Model",
@@ -38,7 +36,7 @@
 						"dataType": {
 							//"id": "oneOne",   // Specialized version of oneMany.
 							//"reference":"Address",
-							// "ownership": true    // Means that the entry it contains is not shared with others. Else the corresponding tug for that child is called. 
+							// "ownership": true    // Means that the entry it contains is not shared with others. Else the corresponding Tug for that child is called. 
 							
 							//"id": "oneMany",
 							//"reference":"Address",
@@ -91,7 +89,7 @@
 				]
 			}			
 		],
-		"dataTypes": [
+		"dataType": [
 			{
 				"id": "String",
 				"class": "java.lang.String",
@@ -116,32 +114,49 @@
 		]
 	},
 	
-	"tugsConfig": {
+	"tugs": {
 		"note1": "Tug initiator for a model is the tug that serves the type of model or a parent class.",
-		"tugs": [
+		"tug": [
+		    {
+                "id": "simpleWorkflow",
+                "class": "com.tugmodel.client.tug.LinearWorkflow",
+		        "workflow": {
+		            // authentication will look inside the model for 3 fields: $user, $password, $organization(optional)
+		            // authorization e.g. model.update() will checke for update privilege (please provide privilege
+		            //    mapping according to executed method as inline settings in the tug id.
+                    "definition": ["authentication", "authorization", ]        
+		        },
+		        "compensate": false
+            },
 			{
 				"id": "baseTug",
-				"class": "com.tugmodel.client.tug.BaseTug",
-				"modelId": "Model",
-				"mapperId": "nonMetaBasedMapper"
+                "modelsServed": ["Model"],				
+				"class": "com.tugmodel.tug.BaseTug",
+				"mapper": {
+				    "id": "nonMetaBasedMapper"
+				} 
 			},
 			{
 				"id": "configTug",
-				"class": "com.tugmodel.client.tug.config.ConfigTug",
+				"class": "com.tugmodel.tug.config.ConfigTug",
 				"modelId": "Config",
-				"mapperId": "nonMetaBasedMapper"
+				"mapper": {
+                    "id": "nonMetaBasedMapper"
+                }
 			},
 			{
 				"id": "metaTug",
-				"class": "com.tugmodel.client.tug.meta.MetaTug",
+				"class": "com.tugmodel.tug.meta.MetaTug",
 				"modelId": "Meta",
 				"mapperId": "nonMetaBasedMapper"
 			},
 			{
 				"id": "sqlTug",
-				"class": "com.tugmodel.client.tug.sql.SQLTug",
+				"class": "com.tugmodel.tug.sql.SQLTug",
 				"modelId": "Employee",
-				"mapperId": "defaultMapper",
+				"mapper": {
+                    "id": "defaultMapper"
+                },				
 				"dbDriver": "com.mysql.jdbc.Driver",
 				"dbUrl": "jdbc:mysql://localhost:3306/testcris",
 				"user": "root",
@@ -158,10 +173,10 @@
 		],	
 		
 		"note2": "A mapper is used by a tug to map a model to a format 'transportable' by the tug.",			
-		"mappers": [
+		"mapper": [
 			{
 				"id": "defaultMapper",
-				"factory": "com.tugmodel.client.mapper.JacksonMappers",
+				"factory": "com.tugmodel.mapper.JacksonMappers",
 				"factory-method": "getMapper",				
 				"config": {
 					"indent": true,
@@ -173,7 +188,7 @@
 			},
 			{
 				"id": "nonMetaBasedMapper",
-				"factory": "com.tugmodel.client.mapper.JacksonMappers",
+				"factory": "com.tugmodel.mapper.JacksonMappers",
 				"factory-method": "getConfigReaderMapper",				
 				"config": {
 					"indent": true,
@@ -183,5 +198,14 @@
 				}
 			}
 		]
-	}					
+	},
+	"model2tug": [
+        {
+            "modelIds": ["Model"],
+	        "tug": {
+	           "id": "baseTug"	           
+            }
+	   }	
+	
+	]
 }

@@ -16,20 +16,20 @@ package com.tugmodel.client.tug;
 
 import java.util.List;
 
-import com.tugmodel.client.list.ModelList;
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.model.config.TugConfig;
+import com.tugmodel.client.model.list.ModelList;
 
 /**
- * Base interface off all tugs. 
+ * Base interface off all tugs.
+ * A tug can serve one or more model types. 
  * A tug is not a model because it contains business logic code. Instead the configuration for a Tug is a model.
- * 
  */
 public interface Tug<M extends Model> {
 
-	public TugConfig<M> getConfig();
+	public TugConfig getConfig();
 	
-	public Tug<M> setConfig(TugConfig<M> config);
+	public Tug<M> setConfig(TugConfig config);
 	
 	//////////////////////////////////////////////////////////////////////
 	// Model direct operations(CRUD & Business).
@@ -72,7 +72,7 @@ public interface Tug<M extends Model> {
     public <C extends Model> List<C> fetchByRawQuery(Class<C> c, String query, Object... params);
 
 	//////////////////////////////////////////////////////////////////////
-	// Transactions - Make more sense when tug is in same process. But there can be also remote transactions.
+	// Transactions(local or remote) - Make more sense when tug is in same process.
 	//////////////////////////////////////////////////////////////////////
     public void transactionStart();
     

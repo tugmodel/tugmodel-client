@@ -16,26 +16,21 @@ package com.tugmodel.client.tug;
 
 import java.util.List;
 
-import com.tugmodel.client.list.ModelList;
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.model.config.TugConfig;
+import com.tugmodel.client.model.list.ModelList;
 
 /**
  * You can use this as base class when implementing tugs.
  */
 public class BaseTug<M extends Model> implements Tug<M> {
-	// Should it be part of the config defaults?.
-//	public static final Mapper PRETTY_PRINT_MAPPER = new JacksonMapper<Model>(); 
-	protected TugConfig<M> config = new TugConfig<M>();
+	protected TugConfig config = new TugConfig();
 	
-	public BaseTug() {
-	}
-	
-	public TugConfig<M> getConfig() {
+	public TugConfig getConfig() {
 		return config;
 	}
 	
-	public Tug<M> setConfig(TugConfig<M> config) {
+	public Tug<M> setConfig(TugConfig config) {
 		this.config = config;
 		return this;
 	}
@@ -107,21 +102,15 @@ public class BaseTug<M extends Model> implements Tug<M> {
 		return (List<C>)notImplementedException();
 	}
 
-	@Override
 	public void transactionStart() {
-		// TODO Auto-generated method stub
-		
+		notImplementedException();		
 	}
 
-	@Override
 	public void trasactionCommit() {
-		// TODO Auto-generated method stub
-		
+		notImplementedException();
 	}
 
-	@Override
 	public void trasactionRollback() {
-		// TODO Auto-generated method stub
-		
+		notImplementedException();
 	}
 }

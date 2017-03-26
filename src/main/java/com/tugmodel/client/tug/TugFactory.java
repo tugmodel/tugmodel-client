@@ -14,14 +14,8 @@
  */
 package com.tugmodel.client.tug;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.model.config.Config;
-import com.tugmodel.client.model.config.TugConfig;
-import com.tugmodel.client.tug.config.ConfigTug;
+
 
 /**
  * TODO: 
@@ -148,6 +142,6 @@ public class TugFactory {
 //	}
 	
 	public static <M extends Model> Tug<M> get(Class<M> modelClass) {
-		return null;
+		return (Tug<M>)null;
 	}
 }

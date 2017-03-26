@@ -15,54 +15,43 @@
 package com.tugmodel.client.model.config;
 
 import com.tugmodel.client.mapper.Mapper;
-import com.tugmodel.client.mapper.jackson.JacksonMappers;
 import com.tugmodel.client.model.Model;
 
 /**
- * Configuration files.
  *  
- * new FileConfig().setPath("config/tm-config.json").fetch().get("tugs") 
  */
-public class TugConfig<M extends Model> extends Model<M> {	
-	protected Mapper<M> mapper;	
+public class TugConfig<M extends TugConfig> extends Model<M> {
 
-	public TugConfig() {	
-	}
-	public TugConfig(Model other) {
-		super(other);
-	}
-	
-	public Mapper<M> getMapper() {
-		if (mapper == null) {
-			try {
-				// TODO: Parse TugConfig and construct apropriatelly.
-				if ("defaultMapper".equals(getId())) { 
-					mapper = JacksonMappers.getMapper(null);
-				} else { 
-					mapper = JacksonMappers.getConfigReaderMapper();
-				}					
-			} catch (Exception e) {
-				throw new RuntimeException(e);  
-			}
-		}
-		return mapper;
-	}
-	
-	public TugConfig<M> setMapper(Mapper<M> mapper) {
-		this.mapper = mapper;
-		return this;
-	}
-	
-	public Class<? extends Model> getModelClass() {
+    public static final String KEY_MAPPER = "mapper";
+    public static final String KEY_CACHED_MAPPER = "cachedMapper";
+
+    /**
+     * Returns cached mapper. If you do not need the cache then do getMapper().mapper(). 
+     */
+    public Mapper<M> mapper() {
+        Mapper mapper = get(KEY_CACHED_MAPPER, Mapper.class);
+        if (mapper == null) {
+            mapper = getMapper().mapper();
+            set(KEY_CACHED_MAPPER, mapper);
+        }
+        return mapper;
+    }
+
+    public MapperConfig getMapper() {
+        return get(KEY_MAPPER, MapperConfig.class);
+    }
+
+    public TugConfig setMapper(MapperConfig val) {
+        return set(KEY_MAPPER, val);
+    }
+    
+	public Class<? extends Model<?>> getModelClass() {
 		String id = asString("modelId");
 //		Meta<Meta<?>>.s.get
 		try {
-			return (Class<? extends Model>)Class.forName(id);
+			return (Class<? extends Model<?>>)Class.forName(id);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-
-
 }
