@@ -29,9 +29,16 @@ import com.tugmodel.client.model.Model;
 public class ReflectionUtil {
     public final static String KEY_CLASS = "class";
     public final static String KEY_FACTORY = "factory";
-    public final static String KEY_FACTORY_METHOD = "method";
+    public final static String KEY_FACTORY_METHOD = "factoryMethod";
     public final static String KEY_FACTORY_ARGS = "args";
 
+    public static Set<String> findGetterProperties(String className) {
+        try {
+            return findGetterProperties(Class.forName(className));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static Set<String> findGetterProperties(Class c) {
         Set<String> list = new TreeSet();
         findGetterProperties(c, list);
@@ -80,19 +87,24 @@ public class ReflectionUtil {
                 Class<T> c = (Class<T>) Class.forName(model.asString(KEY_CLASS));
                 return c.newInstance();
             } else if (model.contains(KEY_FACTORY)) {
-                Model factory = model.asModel(KEY_FACTORY);
+                String factoryClass = model.asString(KEY_FACTORY);
+                String factoryMethod = model.asString(KEY_FACTORY_METHOD);
+
                 // OF course expecting a mapper that keeps type information.
                 List args = model.asList(KEY_FACTORY_ARGS);
+                if (args == null) {
+                    args = new ArrayList();
+                }
                 List<Class> argsTypes = new ArrayList();
                 for (Object arg : args) {
                     argsTypes.add(arg.getClass());
                 }
-                Class<T> c = (Class<T>) Class.forName(model.asString(KEY_CLASS));
-                Method method = c.getMethod(factory.asString(KEY_FACTORY_METHOD), argsTypes.toArray(new Class[] {}));
-                return (T) method.invoke(null, args);
+                Class<T> c = (Class<T>) Class.forName(factoryClass);
+                Method method = c.getMethod(factoryMethod, argsTypes.toArray(new Class[] {}));
+                return (T) method.invoke(null, args.toArray());
             }
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
         return null;
     }

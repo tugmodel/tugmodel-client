@@ -40,6 +40,8 @@ public class ModelList<M extends Model> extends ArrayList<M> {
     
     protected String childId;
 	protected String modelId;
+    // Is this needed?.
+    protected CrudTug tug;
 	
 	public ModelList() {		
 	}
@@ -57,6 +59,15 @@ public class ModelList<M extends Model> extends ArrayList<M> {
         return this;
     }
     
+    public CrudTug tug() {
+        return tug;
+    }
+
+    public ModelList<M> tug(CrudTug tug) {
+        this.tug = tug;
+        return this;
+    }
+
     public boolean isFetchAll() {
     	return limit == 0 && offset == 1 && "".equals(where) && "".equals(orderBy);
     }
@@ -67,6 +78,10 @@ public class ModelList<M extends Model> extends ArrayList<M> {
 
     public boolean isFetchFirst() {
     	return "".equals(where) && limit == 1 && offset == 1 && "".equals(orderBy);
+    }
+
+    public boolean isWhere() {
+        return !"".equals(where);
     }
 
     public boolean isPaginated() {
@@ -141,16 +156,22 @@ public class ModelList<M extends Model> extends ArrayList<M> {
     public String getChild() {
         return childId;
     }
-
     
+    public M first() {
+        fetchIfNeeded();
+        return super.get(0);
+    }
+
     protected boolean fetched = false;
     
     protected void fetchIfNeeded() {
         if (fetched)
             return;
 		try {
-			CrudTug<M> tug = TugFactory.getCrud((Class<M>)Class.forName(modelId));
-			List<M> list = tug.fetch(this);
+            CrudTug<M> crudTug = tug();
+            if (crudTug == null)
+                crudTug = TugFactory.getCrud((Class<M>) Class.forName(modelId));
+            List<M> list = crudTug.fetch(this);
 	        this.addAll(list);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
@@ -244,4 +265,28 @@ public class ModelList<M extends Model> extends ArrayList<M> {
 		return super.subList(fromIndex, toIndex);
 	}
 
+    @Override
+    // Needed to make sure no fetching is needed when elements get added.
+    public boolean add(M e) {
+        fetched = true;
+        return super.add(e);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends M> c) {
+        fetched = true;
+        return super.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends M> c) {
+        fetched = true;
+        return super.addAll(index, c);
+    }
+
+    @Override
+    public void add(int index, M element) {
+        fetched = true;
+        super.add(element);
+    }
 }

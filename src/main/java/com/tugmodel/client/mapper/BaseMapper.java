@@ -15,6 +15,7 @@
 package com.tugmodel.client.mapper;
 
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.model.config.tugs.TugConfig;
 
 /**
  * Base mapper used when creating custom mappers.
@@ -26,24 +27,36 @@ public class BaseMapper<M extends Model> implements Mapper<M> {
 		throw new RuntimeException("You need to implement the inherited Mapper method.");
 	}
 
-	public Object serialize(M fromModel) {
+    public Object serialize(M src) {
 		return notImplementedException();
 	}
 	
-	public M deserialize(Object fromValue) {
+    public M deserialize(Object src) {
 		return (M)notImplementedException();
 	}
 
-	public void updateModel(Object fromValue, M toModel) {
+    public void updateModel(Object src, M destClass) {
 		notImplementedException();
 	}
 	
-	public <T> T convert(Object value, Class<T> dest) {
+    public <T> T convert(Object src, Class<T> dest) {
 		return (T)notImplementedException();
 	}
 
-	public String toPrettyString(Object fromValue) {
+    public String toPrettyString(Object src) {
 		return (String) notImplementedException();
 	}
+
+    private TugConfig tc;
+
+    @Override
+    public void setTugConfig(TugConfig tc) {
+        this.tc = tc;
+    }
+
+    @Override
+    public TugConfig getTugConfig() {
+        return tc;
+    }
 
 }

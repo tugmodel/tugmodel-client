@@ -14,7 +14,18 @@
  */
 package com.tugmodel.client.tug;
 
+import java.util.List;
+import java.util.Map;
+
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.model.config.Config;
+import com.tugmodel.client.model.config.tugs.MapperConfig;
+import com.tugmodel.client.model.config.tugs.TowConfig;
+import com.tugmodel.client.model.config.tugs.TugConfig;
+import com.tugmodel.client.model.list.ModelList;
+import com.tugmodel.client.model.meta.Meta;
+import com.tugmodel.client.model.meta.datatype.DataType;
+import com.tugmodel.client.tug.config.IConfigTug;
 
 
 /**
@@ -141,26 +152,287 @@ public class TugFactory {
 //		
 //		return tug;
 //	}
-	
-	/**
-	 * Returns a CrudTug.
-	 * @param modelClass
-	 * @return
-	 */	
-    public static <M extends Model> CrudTug<M> getCrud(Class<M> modelClass) {
-        if (modelClass == Model.class) {
-            try {
-                // Temporary.
-                return (CrudTug) Class.forName("com.tugmodel.tug.file.FolderBasedTug").newInstance();
+    // Using pair maps allows for lazy initialization of tugs and model classes.
+    // Remember that a tug can serve multiple models.
+    // private static HashMap<String, > MODEL_TO_TUG_ID = new HashMap<String, String>();
+    // //private static HashMap<String, Tug<?>> TUG_ID_TO_TUG_INSTANCE = new HashMap<String, Tug<?>>();
+    // static {
+    // // init(); // Bootstrap.
+    // }
 
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+
+    private static CrudTug configTug;
+	
+    /**
+     * Used internally to bootstrap ONLY THE TUG loading configuration by looking in the files:
+     * tugmodel-config-defaults.json and tugmodel-config.json(user provided). This is needed since the user may decide
+     * to keep the configuration within the database and thus he only needs to provide a tugmodel-config.json that uses
+     * a different Tug for the Config. NOTE: If the user keeps the config in the database he will need to also
+     * load/store the default config by delegating to the default ConfigTug.
+     */
+    private static void bootstrapConfigTug() {
+        try {
+            if (configTug == null) {
+                // Not initialised yet. Use a private bootstrap tug that reads the classpath default&custom config.
+                Model m = (Model) Class.forName("com.tugmodel.tug.config.BootstrapConfigTug")
+                        .getDeclaredMethod("fetch", Model.class).invoke(null, new Model());
+                List<Map> tows = m.asList(Config.KEY_TOWS);
+                List<Map> tugs = m.asList(Config.KEY_TUGS);
+                List<Map> models = m.asList(Config.KEY_MODELS);
+                List<Map> mappers = m.asList(Config.KEY_MAPPERS);
+                String modelId = null, tugId = null, mapperId = null, tugClass = null;
+                Map towConfig = null, tugConfig = null, mapperConfig = null, meta = null;
+                
+                // Get model id based on model class.
+                for (Map model : models) {
+                    if (Config.class.getCanonicalName().equals(model.get("class"))) {
+                        modelId = (String) model.get("id");
+                        meta = model;
+                        break;
+                    }
+                }
+                if (modelId == null) {
+                    throw new RuntimeException("*** There is no model defined for the model class="
+                            + Config.class.getCanonicalName() + ". ***");
+                }
+
+                // Get a tow for the model id.
+                Map tugConfigInsideTow = null;
+                for (Map tow : tows) {
+                    // Config model ID is "Config".
+                    if ("Config".equals(tow.get(TowConfig.KEY_MODEL_ID))) {
+                        towConfig = (Map) tow.get("tug");
+                        tugId = (String) towConfig.get("id");
+                        break;
+                    }
+                }
+                if (tugId == null) {
+                    throw new RuntimeException("*** There is no tow defined for the modelId=" + modelId + ". ***");
+                }
+
+                // Get the tug for the tow.
+                for (Map tug : tugs) {
+                    if (tugId.equals(tug.get("id"))) {
+                        tugConfig = tug;
+                        tugClass = (String) tug.get("class");
+                        mapperId = (String) ((Map) tug.get("mapper")).get("id");
+                        break;
+                    }
+                }
+                if (tugId == null) {
+                    throw new RuntimeException("*** There is no tow defined for the modelId=" + modelId + ". ***");
+                }
+
+                // Get the mapper for the tug.
+                for (Map mapper : mappers) {
+                    if (mapper.get("id").equals(mapperId)) {
+                        mapperConfig = mapper;
+                        break;
+                    }
+                }
+                if (mapperConfig == null) {
+                    throw new RuntimeException("*** There is no mapper defined for the id =" + mapperId + ". ***");
+                }
+
+                // Now merge the mapper.
+                mapperConfig.putAll((Map) tugConfig.get("mapper"));
+                tugConfig.put("mapper", mapperConfig);
+                tugConfig.put("model", meta);
+
+                tugConfig.putAll(towConfig);
+
+                configTug = (CrudTug) Class.forName((String) tugConfig.get("class")).newInstance();
+                configTug.getConfig().merge(tugConfig);
+
+                if (configTug == null) {
+                    throw new RuntimeException("*** There is no tug defined for the id =" + tugId + ". ***");
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Can not bootstrap: " + e.getClass() + ": " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Use to get the tug manually instead of doing stuff like TowConfig.s which may lead to cycles. Similar with the
+     * one above. It also does merging: 1. First the tug.mapper is merged with the corresponding mapper definition. 2.
+     * The tug settings inlined inside the tows are merged with a corresponding tug definition.
+     */
+    private static Tug getForModelViaConfig(String modelId) {
+        // Each time I refetch the config. If caching needed do it in the tug since it is business logic!!!.
+        Config config = new Config().setId("defaults").fetch();
+
+        String tugId = null, mapperId = null;
+        TowConfig towConfig = null;
+        TugConfig tugConfig = null; 
+        MapperConfig mapperConfig = null;
+
+        Meta model = getConfigTug(config, Meta.class).fetchById(modelId);
+        if (model == null) {
+            throw new RuntimeException("*** There is no model defined for the model id=" + modelId + ". ***");
+        }
+
+        ModelList<TowConfig> tows = getConfigTug(config, TowConfig.class).where("modelId=?", modelId);
+        if (tows.isEmpty()) {
+            throw new RuntimeException("*** There is no tow defined for the modelId=" + modelId + ". ***");
+        }
+        towConfig = tows.first();
+        tugId = towConfig.getTug().getId();
+
+        tugConfig = getConfigTug(config, TugConfig.class).fetchById(tugId);
+        if (tugConfig == null) {
+            throw new RuntimeException("*** There is no tug defined for the id =" + tugId + ". ***");
+        }
+        mapperId = tugConfig.getMapper().getId();
+        mapperConfig = getConfigTug(config, MapperConfig.class).fetchById(mapperId);
+        if (mapperConfig == null) {
+            throw new RuntimeException("*** There is no mapper defined for the id =" + mapperId + ". ***");
+        }
+
+        // Now merge 1 in 2 steps (first the mapper then the tug settings from tow).
+        MapperConfig mc = mapperConfig.merge(tugConfig.getMapper());
+        tugConfig.setMapper(mc);
+        tugConfig.merge(towConfig.getTug());
+        tugConfig.set("model", model);
+
+        try {
+            Tug tug = (Tug) Class.forName(tugConfig.asString("class")).newInstance();
+            tug.setConfig(tugConfig);
+            return tug;
+        } catch (Exception e) {
+            throw new RuntimeException("Can not create tug " + tugId + ": " + e.getClass() + ": " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Returns a Tug for the given modelId.
+     */
+    public static Tug getByModel(String modelId) {
+        bootstrapConfigTug();
+        if ("Config".equals(modelId)) {
+            return configTug;
+        }
+
+        Tug tug = getForModelViaConfig(modelId);
+        return (CrudTug) tug;
+    }
+
+    private static <T extends Model> CrudTug<T> getConfigTug(Config config, Class<T> modelClass) {
+        String type = "all";
+        // TODO: refactor.
+        if (modelClass == Meta.class) {
+            type = "models";
+        } else if (modelClass == TowConfig.class) {
+            type = "tows";
+        } else if (modelClass == DataType.class) {
+            type = "dataTypes";
+        } else if (modelClass == TugConfig.class) {
+            type = "tugs";
+        } else if (modelClass == MapperConfig.class) {
+            type = "mappers";
+        }
+        // Needs reflection because the ConfigTug is part of the basic set of mappers which is in a separate module.
+        IConfigTug<T> tug = (IConfigTug<T>) getByTug("configTug");
+        tug.workWith(config);
+        tug.getConfig().set("type", type);
+        return tug;
+    }
+    /**
+     * Returns a Tug for the given modelClass.
+     */
+    public static Tug getByModel(Class modelClass) {
+        bootstrapConfigTug();
+        if (modelClass == Config.class) {
+            return configTug;
+        }
+
+        // Each time I refetch the config. If caching needed do it in the tug since it is business logic!!!.
+        Config config = new Config().setId("defaults").fetch();
+        CrudTug metaTug = getConfigTug(config, Meta.class);
+        ModelList<Meta> models = metaTug.where("class=?", modelClass.getCanonicalName());
+        if (models.isEmpty()) {
+            throw new RuntimeException(
+                    "*** There is no model defined for the model class=" + Config.class.getCanonicalName() + ". ***");
+        }
+
+        // Model mm = new Model().set("x", 1);
+        Tug tug = getForModelViaConfig(models.first().getId());
+        return tug;
+    }
+
+    /**
+     * Returns CrudTug for the given model class.
+     */
+    public static <M extends Model> CrudTug<M> getCrud(Class<M> modelClass) {
+        return (CrudTug) getByModel(modelClass);
+    }
+
+    /**
+     * Returns Tug for the given model id.
+     */
+    public static <M extends Model> CrudTug<M> getCrud(String modelId) {
+        return (CrudTug) getByModel(modelId);
+    }
+
+    /**
+     * @returns a tug for the given tugClass. Think of it as Service(Tug) Factory.
+     */
+    public static Tug getByTug(Class tugClass) {
+        // Each time I refetch the config. If caching needed do it in the tug since it is business logic!!!.
+        Config config = new Config().setId("defaults").fetch();
+
+        CrudTug tug = getConfigTug(config, TugConfig.class);
+        ModelList<TugConfig> tcList = tug.where("class=?", tugClass.getCanonicalName());
+        if (tcList.isEmpty()) {
+            throw new RuntimeException(
+                    "*** There is no tug defined for the tug class=" + tugClass.getCanonicalName() + ". ***");
+        }
+        return getByTug(tcList.first().getId());
+    }
+
+    public static Tug getByTug(String tugId) {
+        // Each time I refetch the config. If caching needed do it in the tug since it is business logic!!!.
+        Config config = new Config().setId("defaults").fetch();
+
+        String mapperId = null, tugClassName = null;
+        TugConfig tugConfig = null;
+        MapperConfig mapperConfig = null;
+
+        // Get the tug for the tow.
+        for (TugConfig tug : config.getTugs()) {
+            if (tug.getId().equals(tugId)) {
+                tugConfig = tug;
+                tugClassName = tug.asString("class");
+                mapperId = tug.getMapper().getId();
+                break;
             }
         }
-        return (CrudTug<M>) null;
+        if (tugConfig == null) {
+            throw new RuntimeException("*** There is no tug defined for the tug class =" + tugClassName + ". ***");
+        }
+
+        // Get the mapper for the tug.
+        for (MapperConfig mapper : config.getMappers()) {
+            if (mapperId.equals(mapper.getId())) {
+                mapperConfig = mapper;
+                break;
+            }
+        }
+        if (mapperConfig == null) {
+            throw new RuntimeException("*** There is no mapper defined for the id =" + mapperId + ". ***");
+        }
+
+        // Now merge the mapper.
+        MapperConfig mc = mapperConfig.merge(tugConfig.getMapper());
+        tugConfig.setMapper(mc);
+        try {
+            Tug tug = (Tug) Class.forName(tugConfig.asString("class")).newInstance();
+            tug.setConfig(tugConfig);
+            return tug;
+        } catch (Exception e) {
+            throw new RuntimeException("Can not create tug " + tugId + ": " + e.getClass() + ": " + e.getMessage(), e);
+        }
     }
 
-    public static <M extends Model> Tug get(Class<M> modelClass) {
-        return (Tug) null;
-    }
+
 }

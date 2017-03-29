@@ -16,7 +16,9 @@ package com.tugmodel.client.model;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -96,6 +98,15 @@ public class TestModelUtil {
         ModelUtil.mergeDeeply(src, dest);
         assertTrue((Integer) ((Model) dest.get("subModel")).get("sa") == 2);
         assertTrue((Integer) ((Model) dest.get("subModel")).get("sc") == 1);
+    }
+
+    @Test
+    public void testClone() {
+        List l1 = new ArrayList();
+        Model m = new Model().set("a", l1).clone();
+        List l2 = m.clone().asList("a");
+
+        assertTrue(l1 != l2);
     }
 
 }

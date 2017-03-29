@@ -17,12 +17,8 @@ package com.tugmodel.client.model;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.junit.Test;
-
-import com.tugmodel.client.model.config.Config;
-import com.tugmodel.client.model.meta.Meta;
 
 import javassist.CannotCompileException;
 import javassist.NotFoundException;
@@ -58,13 +54,13 @@ public class TestModel {
     
     @Test
     public void modelSetter() {
-        assertTrue(new Model().set("a", 1).asInteger("a") == 1);
+        assertTrue(new Model().set("a", 1).asInt("a") == 1);
     }
 
     
     private static class XModel extends Model<XModel> {
         public int getX() {
-            return asInteger("x");
+            return asInt("x");
         }
         public XModel setX(int val) {
             return set("x", 1);
@@ -85,9 +81,17 @@ public class TestModel {
         m.setX(1);
         
         assertTrue(m.getX() == 1);
-        assertTrue(m.getExtraAttributes().size() == 1);
-        assertTrue(((Integer)m.getExtraAttributes().get("y")) == 0);
+        assertTrue(m.extraFields().size() == 1);
+        assertTrue(((Integer)m.extraFields().get("y")) == 0);
         
     }
 
+    @Test
+    public void testMerge() {
+        Model m1 = new Model().set("x", 0).set("y", 2);
+        Model m2 = new Model().set("x", 1).set("y", 2);
+        m1.merge(m2);
+        assertTrue(m1.asInt("x") == 1);
+        assertTrue(m1.asInt("y") == 2);
+    }
 }

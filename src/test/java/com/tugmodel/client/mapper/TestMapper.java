@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.model.config.tugs.TugConfig;
 
 public class TestMapper {
 
@@ -27,30 +28,42 @@ public class TestMapper {
 	public void testConvert() {
 		Mapper<Model> mapper = new Mapper<Model>() {
 
-			public Object serialize(Model fromModel) {
+            public Object serialize(Model src) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
-			public Model deserialize(Object fromValue) {
+            public Model deserialize(Object src) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
-			public void updateModel(Object fromValue, Model toModel) {
+            public void updateModel(Object src, Model dest) {
 				// TODO Auto-generated method stub
 				
 			}
 
-			public <T> T convert(Object fromValue, Class<T> toValueType) {
+            public <T> T convert(Object src, Class<T> destClass) {
 				// TODO Auto-generated method stub
-				return (T) String.valueOf(fromValue);
+                return (T) String.valueOf(src);
 			}
 
-			public String toPrettyString(Object fromValue) {
+            public String toPrettyString(Object src) {
 				// TODO Auto-generated method stub
 				return null;
 			}
+
+            @Override
+            public void setTugConfig(TugConfig tc) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public TugConfig getTugConfig() {
+                // TODO Auto-generated method stub
+                return null;
+            }
 
 		};
 		

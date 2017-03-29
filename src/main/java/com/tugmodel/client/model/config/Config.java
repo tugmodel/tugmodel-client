@@ -14,30 +14,74 @@
  */
 package com.tugmodel.client.model.config;
 
+import java.util.List;
+
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.model.config.tugs.MapperConfig;
+import com.tugmodel.client.model.config.tugs.TowConfig;
+import com.tugmodel.client.model.config.tugs.TugConfig;
+import com.tugmodel.client.model.meta.Meta;
+import com.tugmodel.client.model.meta.datatype.DataType;
+import com.tugmodel.client.tug.CrudTug;
+import com.tugmodel.client.tug.TugFactory;
 
 /**
- * Basic configuration of the entire tugmodel system. 
+ * Basic configuration of the entire tugmodel system.
+ * Use <code>Config.s.fetchById("defaults")</code> or
+ *     <code>new Config().setId("defaults").set("tenant", tenantId).fetch()</code> 
+ * to fetch configuration.
+ *  
  */
 @SuppressWarnings("all")
-public class Config<M extends Config> extends Model<M> {
-    public static final String KEY_METADATA = "metadata";
+// public class Config<M extends Config> extends Model<M> {
+public class Config extends Model<Config> {
+    public static final CrudTug<Config> s = TugFactory.getCrud(Config.class);
+
+    public static final String KEY_MODELS = "models";
+    public static final String KEY_DATATYPES = "dataTypes";
     public static final String KEY_TUGS = "tugs";
+    public static final String KEY_MAPPERS = "mappers";
+    public static final String KEY_TOWS = "tows";
 
-    // Be careful for the method name to match the property in the JSON.
-    public Model getMetadata() {
-        return asModel(KEY_METADATA);
+    // USE the Meta.s to obtain by id or condition.
+    public List<Meta> getModels() {
+        return (List<Meta>) get(KEY_MODELS);
     }
 
-    public Config setMetadata(Model mc) {
-        return set(KEY_METADATA, mc);
+    public Config setModels(List<Meta> val) {
+        return set(KEY_MODELS, val);
     }
 
-    public Model getTugs() {
-        return asModel(KEY_TUGS);
+    public List<DataType> getDataTypes() {
+        return (List<DataType>) get(KEY_DATATYPES);
     }
 
-    public Config setTugs(Model mc) {
-        return set(KEY_TUGS, mc);
+    public Config setDataTypes(List<DataType> val) {
+        return set(KEY_DATATYPES, val);
     }
+
+    public List<TugConfig> getTugs() {
+        return (List<TugConfig>) get(KEY_TUGS);
+    }
+
+    public Config setTugs(List<TugConfig> val) {
+        return set(KEY_TUGS, val);
+    }
+
+    public List<MapperConfig> getMappers() {
+        return (List<MapperConfig>) get(KEY_MAPPERS);
+    }
+
+    public Config setMappers(List<MapperConfig> val) {
+        return set(KEY_MAPPERS, val);
+    }
+
+    public List<TowConfig> getTows() {
+        return (List<TowConfig>) get(KEY_TOWS);
+    }
+
+    public Config setTows(List<TowConfig> val) {
+        return set(KEY_TOWS, val);
+    }
+
 }

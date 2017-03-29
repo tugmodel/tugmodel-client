@@ -14,7 +14,7 @@
  */
 package com.tugmodel.client.tug;
 
-import com.tugmodel.client.model.config.TugConfig;
+import com.tugmodel.client.model.config.tugs.TugConfig;
 
 /**
  * Base interface off all tugs.

@@ -35,10 +35,11 @@ import com.tugmodel.client.util.ReflectionUtil;
 
 /**
  * Base class for all models. It is used by tug interface for various operations.
- * TODO: Consider the usage of a model interface.
+ * Model is base class for all models, is extensible (can store unexpected fields) and can run CRUD operations(via tug).
+ * NOTE: Tugs can work also with non-models. 
  * 
  * INSPIRATION:
- * 	Similar to ideas found in JavaLite(http://javalite.io/getting_started), backbone.js and other active records frameworks (https://en.wikipedia.org/wiki/Active_record_pattern).
+ * 	Some inspiration from JavaLite(http://javalite.io/getting_started), BPMN, backbone.js and active records frameworks (https://en.wikipedia.org/wiki/Active_record_pattern).
  * 	Will bound type parameter where the upper bound is the same class. Inspiration from here: http://stackoverflow.com/questions/19312641/passing-generic-subtype-class-information-to-superclass-in-java :
  * 	<pre>public abstract class Abstract<T extends Abstract<T>> { </pre>
  * 	Will use Factory pattern (http://docs.oracle.com/javase/tutorial/extra/generics/literals.html) for factory methods.
@@ -46,7 +47,7 @@ import com.tugmodel.client.util.ReflectionUtil;
  * 	For keeping the actual data of the model:
  * 		1. Keep it in Maps: <pre>public class Model<MODEL extends Model<MODEL>> implements Externalizable {</pre>
  * 		2. Keep it in an abstract storage bean(TugBean): <pre> public class Model<M extends Model<M, DATA>, DATA extends TugBean<?>> implements Externalizable { </pre>
- *    		2 works and is more flexible since it allows substituting the underlying storage but it is mind blowing. Will try 1 first which is simpler and 2 later.
+ *    		2 works and is more flexible since it allows substituting the underlying storage but it is harder. Will try 1 first which is simpler and 2 later.
  *    
  * RULE: Tugs act as services, models act as smart/active POJO's which delegate operations to tugs. 
  * 		<b>The only thing that you should place inside models methods are calls to other models or tugs invocations.</b>
@@ -55,29 +56,24 @@ import com.tugmodel.client.util.ReflectionUtil;
  * EXTENSIBILITY:
  *  Allows extensible documents/models like the ones in NoSQL. Thus any data can be stored under a model as long as the tug knows how to deliver/process it. 
  * 	For this use the generic "set" and "get" methods. 
- *  In order to differentiate between extra data and expected the metadata is used (no setMy, getMy) methods are required.    
+ *  In order to differentiate between extra data and expected reflection or metadata is used.    
  * 
  * CHAINING CALLS:
- * 	Calls are chainable: new Model().set("f", 1).save();
+ * 	Calls are chainable: <code>new Model().set("f", 1).save();</code>
  * 
- * MAPPER:
- *        Jackson Mixin used to add annotations forJackson Mapper.
- *        The model must not decide how is to be serialized but the Mapper&Tug.
- *        
  * SENDING CALLER INFO (e.g. session id, client IP, authorization token):
- *     1. No dedicated method is provided you just set whatever you consider in an extra model attribute as a simple/complex value.
- * 		Model model = new Model().set("authToken", "x13123").set("attr1", "x").save();
- *     When querying using the Tug:     		
- *     		XModel.s.find(id, auth);
- *     2. Better: the Tug should obtain and send/process caller info.
- * 
- * 
+ *     1. As a model field within same model.
+ * 		<code>Model model = new Model().set("$authToken", "x13123").set("attr1", "x").save();</code>
+ *     2. As a separate model called AuthTokenModel with a corresponding tug.
+ *        Obtaining the token from within any tug: <code>AuthTokenModel.s.fetch("current");</code>
+ *     3. Underlying within a tug. E.g. An InheritableThreadLocal may be used to store it and the tug reads the ITL. 
  */
-@SuppressWarnings("all")  // Or add one by one @SuppressWarnings("rawtypes")  @SuppressWarnings("unchecked")
-public class Model<M extends Model> {	
+@SuppressWarnings("all") // Or one by one @SuppressWarnings("rawtypes") @SuppressWarnings("unchecked")
+public class Model<M extends Model> implements Cloneable {
     public static final String KEY_ID = "id";
     public static final String KEY_VERSION = "version";
     public static final String KEY_TENANT = "tenant";
+    public static final String KEY_CLASS = "class";
     protected boolean usesMeta = false;   // If meta should be used when obtaining extra attributes or just reflection.
     protected Map<String, Object> data = Collections.synchronizedMap(new LinkedHashMap<String, Object>());
 
@@ -88,20 +84,27 @@ public class Model<M extends Model> {
     // Copy constructor.
     public Model(Model other) {
         data = other.data();
-    }
-
-    // Deep merge.
-    public M merge(Model src) {
-        ModelUtil.mergeDeeply(data(), src.data());
-        return (M)this;
-    }
+    }    
 
     public Object get(String attr) {
         return data().get(attr);
     }
     
+    public Object remove(String attr) {
+        return data().remove(attr);
+    }
+
     public <T> T get(String attr, Class<T> valueType) {
         T value = (T) data().get(attr);
+        return value;
+    }
+
+    public <T> T get(String attr, Class<T> valueType, T defaultValue) {
+        T value = (T) data().get(attr);
+        if (value == null) {
+            // set(attr, defaultValue);
+            return defaultValue;
+        }
         return value;
     }
 
@@ -119,12 +122,12 @@ public class Model<M extends Model> {
         return (String) data().get(attr);
     }
 
-    public Byte asByte(String attr) {
-        return (Byte) data().get(attr);
+    public Integer asInt(String attr) {
+        return (Integer) data().get(attr);
     }
 
-    public Integer asInteger(String attr) {
-        return (Integer) data().get(attr);
+    public Byte asByte(String attr) {
+        return (Byte) data().get(attr);
     }
 
     public Long asLong(String attr) {
@@ -175,6 +178,27 @@ public class Model<M extends Model> {
     public Map<String, Object> data() {
         return data;
     }
+
+    // Deep merge.
+    public M merge(Model src) {
+        return merge(src.data());
+    }
+
+    public M merge(Map src) {
+        ModelUtil.mergeDeeply(src, data());
+        return (M) this;
+    }
+    
+    public M clone() {
+        try {
+            M clone = (M) this.getClass().newInstance();
+            clone.data = (Map) ModelUtil.deepClone(this.data());
+            return clone;
+        } catch (Exception e) {
+            throw new RuntimeException("can not clone.", e);
+        }
+    }
+
     // Because null can a be a model attribute value.
     public boolean contains(String attr) {
         return data().containsKey(attr);
@@ -187,11 +211,11 @@ public class Model<M extends Model> {
     }
 
     // Returns attributes that are set but do not have dedicated getters nor listed in the metadata.
-    public Map<String, ?> getExtraAttributes() {
+    public Map<String, ?> extraFields() {
         Map<String, Object> extra = new HashMap();  // this.hashCode()
 
         if (!usesMeta) {
-            // Else use getters. TODO: For performance obtain getters only once not each time.
+            // Use getters. TODO: For performance obtain getters only once not each time.
             Set<String> myProps = ReflectionUtil.findGetterProperties(this.getClass());
             myProps.remove("extraAttributes");
             for (Map.Entry<String, Object> entry : data().entrySet()) {
@@ -215,7 +239,7 @@ public class Model<M extends Model> {
     }
 
     // No get in front to not hide a potential field with same name.
-    protected CrudTug<M> tug() {
+    public CrudTug<M> tug() {
         return TugFactory.getCrud((Class<M>) this.getClass());
     }
 
@@ -263,10 +287,12 @@ public class Model<M extends Model> {
         List list = tug().add((M) this, Collections.singletonList(child));
     }
 
-    // Use only for pretty print.
+    /**
+     * Use only for debug since it calls <code>tug.mapper.toPrettyString()</code>. It should also contain class
+     * information('@c' field) which is also helpful.
+     */
     @Override
     public String toString() {
-        //return tug().getConfig().getMapper().toPrettyString(this);   // this.hashCode()
-        return null;
+        return tug().getConfig().mapper().toPrettyString(this);
     }
 }

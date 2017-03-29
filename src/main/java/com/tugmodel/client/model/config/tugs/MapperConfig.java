@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.config;
+package com.tugmodel.client.model.config.tugs;
 
 import com.tugmodel.client.mapper.Mapper;
 import com.tugmodel.client.model.Model;
 import com.tugmodel.client.tug.CrudTug;
 import com.tugmodel.client.tug.TugFactory;
+import com.tugmodel.client.util.Keys;
 import com.tugmodel.client.util.ReflectionUtil;
 
 /**
@@ -26,7 +27,7 @@ import com.tugmodel.client.util.ReflectionUtil;
  * that overwrite the default mapper properties within the model served by MapperConfig.   
  */
 @SuppressWarnings("all")
-public class MapperConfig<M extends MapperConfig> extends Model<M> {
+public class MapperConfig extends Model<MapperConfig> {
     // This tug returns the list of possible mappers.
     public static final CrudTug<MapperConfig> s = TugFactory.getCrud(MapperConfig.class);
 
@@ -37,10 +38,16 @@ public class MapperConfig<M extends MapperConfig> extends Model<M> {
      *   2. Extend/implement a custom tug for serving CustomMapperConfig instances.  
      */
     @SuppressWarnings("unchecked")
-    public Mapper<M> mapper() {
-        MapperConfig<M> mapper = MapperConfig.s.fetchById(asString(Model.KEY_ID));
-        mapper.merge(this); // Merge over default mapper.
-
-        return ReflectionUtil.createInstance(mapper, Mapper.class);
+    public Mapper mapper() {
+        return ReflectionUtil.createInstance(this, Mapper.class);
     }
+
+    public String getFactory() {
+        return asString(Keys.FACTORY);
+    }
+
+    public MapperConfig setFactory(String val) {
+        return set(Keys.FACTORY, val);
+    }
+
 }

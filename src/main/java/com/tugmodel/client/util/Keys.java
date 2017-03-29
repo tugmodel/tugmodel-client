@@ -12,24 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.sample;
-
-import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.CrudTug;
-import com.tugmodel.client.tug.TugFactory;
+package com.tugmodel.client.util;
 
 /**
- * Classical Oracle example.
+ * Key shortcuts.
  */
-public class Employee extends Model<Employee> {
-    public static final CrudTug<Employee> s = TugFactory.getCrud(Employee.class);
-	
-	public String getName() {
-		return asString("name");
-	}
-	
-	public Employee setName(String name) {
-		return set("name", name);
-	}
-	
+public class Keys {
+    public static final String FACTORY = "factory";
+    public static final String FACTORY_METHOD = "factoryMethod";
 }

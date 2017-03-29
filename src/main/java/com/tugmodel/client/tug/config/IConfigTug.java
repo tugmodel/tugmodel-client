@@ -12,24 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.sample;
+package com.tugmodel.client.tug.config;
 
 import com.tugmodel.client.model.Model;
+import com.tugmodel.client.model.config.Config;
 import com.tugmodel.client.tug.CrudTug;
-import com.tugmodel.client.tug.TugFactory;
 
 /**
- * Classical Oracle example.
+ * Interface for a config tug.
  */
-public class Employee extends Model<Employee> {
-    public static final CrudTug<Employee> s = TugFactory.getCrud(Employee.class);
-	
-	public String getName() {
-		return asString("name");
-	}
-	
-	public Employee setName(String name) {
-		return set("name", name);
-	}
-	
+public interface IConfigTug<M extends Model> extends CrudTug<M> {
+    public IConfigTug workWith(Config config);
 }

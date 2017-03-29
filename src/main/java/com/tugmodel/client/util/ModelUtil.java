@@ -14,6 +14,9 @@
  */
 package com.tugmodel.client.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.tugmodel.client.model.Model;
@@ -53,6 +56,39 @@ public class ModelUtil {
                 }
             }
             dest.put(key, srcValue);
+        }
+    }
+
+    /**
+     * Deep clone tentative.
+     */
+    public static Object deepClone(Object data) {
+        if (data == null) {
+            return null;
+        } else if (data instanceof Map) {
+            Map dataMap = (Map) data;
+            Map cloneMap = new HashMap();
+            for (Object key : dataMap.keySet()) {
+                Object value = dataMap.get(key);
+                cloneMap.put(key, deepClone(value));
+            }
+            return cloneMap;
+        } else if (data instanceof Collection) {
+            Collection valueCollection = (Collection) data;
+            Collection cloneCollection = new ArrayList();
+            for (Object el : valueCollection) {
+                cloneCollection.add(deepClone(el));
+            }
+            return cloneCollection;
+        } else if (data instanceof Cloneable) {
+            try {
+                Object clonedValue = data.getClass().getMethod("clone").invoke(data);
+                return clonedValue;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return data;
         }
     }
 }

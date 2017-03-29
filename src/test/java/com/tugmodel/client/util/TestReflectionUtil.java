@@ -12,24 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tugmodel.client.model.sample;
+package com.tugmodel.client.util;
+
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
+
+import org.junit.Test;
 
 import com.tugmodel.client.model.Model;
-import com.tugmodel.client.tug.CrudTug;
-import com.tugmodel.client.tug.TugFactory;
 
-/**
- * Classical Oracle example.
- */
-public class Employee extends Model<Employee> {
-    public static final CrudTug<Employee> s = TugFactory.getCrud(Employee.class);
-	
-	public String getName() {
-		return asString("name");
-	}
-	
-	public Employee setName(String name) {
-		return set("name", name);
-	}
-	
+public class TestReflectionUtil {
+
+    @Test
+    public void testFactoryCreation() {
+        Model<Model> m = new Model();
+        m.set(ReflectionUtil.KEY_FACTORY, "com.tugmodel.client.util.ReflectionUtil");
+        m.set(ReflectionUtil.KEY_FACTORY_METHOD, "findGetterProperties");
+        m.set(ReflectionUtil.KEY_FACTORY_ARGS, Collections.singletonList(Model.class.getCanonicalName()));
+
+        Object r = ReflectionUtil.createInstance(m, Object.class);
+
+        assertTrue(r != null);
+
+    }
 }
