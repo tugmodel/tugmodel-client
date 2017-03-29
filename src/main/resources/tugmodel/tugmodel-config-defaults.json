@@ -1,214 +1,266 @@
 {
-    "note": "Do not modify this file!. Create a file named tugmodel-config.json with you configs. Your file will be merged at runtime over this one.",
-    "note2": "Contains 3 sections: MODELS, TUGS and TOWS.",
-    "note3": "Inside any model/tug/mapper configuration model you can provide a @c element to force a specific class instance to be created insted of the default. This is why @c is used.",
+    "note1": "Do not modify this bootstrap config file!. Create a file named tugmodel-config.json with you configs. Your file will be merged at runtime over this one.",
+    "note2": "Configuration is obtained via a tug. This means that you can divert it to a database.",
+    "note3": "Inside any model/tug/mapper configuration model you can provide a @c element to force a specific class instance.",
     "id": "defaults",
     "version": "1.0",
-    "models": {
-        "note": "These are basic models. The model metadata is obtained also via tug for Meta. This means that you can divert the source and format of the meta.",
-        "note2": "TODO: Model classes can be generated automatically(freemaker) using default interpreter or your own but is better that you manually maintain them.",
-        "models": [
-            {
-                "id": "Model",
-                "class": "com.tugmodel.client.model.Model",             
-                "note": "If 'class' is specified then no need to specify 'parent':'<modelId>'.",
-                "description": "parent for all models",
-                "attributes": [
-                    {
-                        "id": "id",                     
-                        "dataType": {                            
-                            // It is merged with the one in metadata.dataTypes.
-                            "id": "String",
-                            "max": "1001"
-                        }
-                    }
-                ]           
-            },
-            {
-                "id": "Meta",
-                "class": "com.tugmodel.client.model.meta.Meta",
-                "description": "Meta model.",
-                "attributes": [
-                    {
-                        "id": "description",
-                        "dataType": {
-                            "id": "String"
-                        }
-                    },
-                    {
-                        "id": "attributes",
-                        "dataType": {
-                            //"id": "oneOne",   // Specialized version of oneMany.
-                            //"reference":"Address",
-                            // "ownership": true    // Means that the entry it contains is not shared with others. Else the corresponding Tug for that child is called. 
-                            
-                            //"id": "oneMany",
-                            //"reference":"Address",
-                            
-                            //"id": "manyMany",  // Via asociation table.
-                            //"reference":"Address",
-
-                            "id": "oneMany",
-                            "reference":"Attribute"                         
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "Attribute",
-                "class": "com.tugmodel.client.model.meta.Attribute",
-                "attributes": [
-                    {
-                        "id": "dataType",                       
-                        "dataType": {
-                            "id": "oneOne",
-                            "reference":"DataType"
-                        }
-                    }
-                ]           
-            },
-            {
-                "id": "DataType",
-                "class": "com.tugmodel.client.model.meta.DataType"
-            },
-            {
-                "id": "Config",
-                "class": "com.tugmodel.client.model.config.Config",
-                "description": "Base configuration obtained by merging your custom config from 'tugmodel-config.json' over defaults in 'tugmodel-config-defaults.json'.",
-                "note": "If you want to store your custom config in a db, then overwrite the 'configTug' and do the defaults merging by either extending 'configTug' and/or calling it manually.",
-                "TODO": "Consider 'postFilter': 'configTug'."                
-            },
-            {
-                "id": "Employee",
-                "class": "com.tugmodel.client.model.sample.Employee",
-                "description": "Sample model.",
-                "attributes": [
-                    {
-                        "id": "name",
-                        "dataType": {
-                            "id": "String",
-                            "max": 100
-                        }
-                    }
-                ]
-            }           
-        ],
-        "dataType": [
-            {
-                "id": "String",
-                "class": "java.lang.String",
-                "min": 0,
-                "max": 2147483647
-                // TODO: "validatorId"          
-            },
-            {
-                "id": "StringMax64",
-                "class": "java.lang.String",
-                "min": 0,
-                "max": 64           
-            },
-            {
-                "id": "Integer",
-                "class": "java.lang.Integer"
-            },
-            {
-                "id": "oneOne",
-                "javaType": "java.lang.Object"
-            }
-        ]
-    },
     
-    "tugs": {
-        "note1": "Tug initiator for a model is the tug that serves the type of model or a parent class.",
-        "tug": [
-            {
-                "id": "simpleWorkflow",
-                "class": "com.tugmodel.client.tug.LinearWorkflow",                
-                "workflow": {
-                    // authentication will look inside the model for 3 fields: $user, $password, $organization(optional)
-                    // authorization e.g. model.update() will checke for update privilege (please provide privilege
-                    //    mapping according to executed method as inline settings in the tug id.
-                    "definition": ["authentication", "authorization"]        
+    ////////////////////////////// MODELS //////////////////////////////
+    "models": [{
+            "id": "Model",
+            "class": "com.tugmodel.client.model.Model",
+            // If 'class' is specified then no need to specify 'parent':'<modelId>'.
+            // "Model classes can be generated automatically(freemaker) using default interpreter or your own but is better that you manually maintain them.
+            "description": "parent for all models",
+            "attributes": [{
+                    "id": "id",
+                    "dataType": {
+                        // It is merged with the one in metadata.dataTypes.
+                        "id": "String",
+                        "max": "1001"
+                    }
+                }
+            ]
+        }, 
+        {
+            "id": "Config",
+            "class": "com.tugmodel.client.model.config.Config",
+            "description": "Keeps an entire configuration(models, tugs, tows, ...)."
+            // If you want to store your custom config in a db, then change the tow for modelId=Config.
+            // If you want a different model for keeping configurations then extend the 'class' above and tow.
+        },
+        {
+            "id": "MapperConfig",
+            "class": "com.tugmodel.client.model.config.tugs.MapperConfig"
+        },
+        {
+            "id": "TugConfig",
+            "class": "com.tugmodel.client.model.config.tugs.TugConfig"
+        },
+        {
+            "id": "TowConfig",
+            "class": "com.tugmodel.client.model.config.tugs.TowConfig"
+        },
+        {
+            "id": "DataType",
+            "class": "com.tugmodel.client.model.meta.datatype.DataType"
+        },
+        {
+            "id": "Meta",
+            "class": "com.tugmodel.client.model.meta.Meta",
+            "description": "Meta model.",
+            "attributes": [{
+                    "id": "description",
+                    "dataType": {
+                        "id": "String"
+                    }
+                }, {
+                    "id": "attributes",
+                    "dataType": {
+                        //"id": "oneOne",   // Specialized version of oneMany.
+                        //"reference":"Address",
+                        // "ownership": true    // Means that the entry it contains is not shared with others. Else the corresponding Tug for that child is called.
+
+                        //"id": "oneMany",
+                        //"reference":"Address",
+
+                        //"id": "manyMany",  // Via asociation table.
+                        //"reference":"Address",
+
+                        "id": "oneMany",
+                        "reference": "Attribute"
+                    }
+                }
+            ]
+        }, {
+            "id": "Attribute",
+            "class": "com.tugmodel.client.model.meta.Attribute",
+            "attributes": [{
+                    "id": "dataType",
+                    "dataType": {
+                        "id": "oneOne",
+                        "reference": "DataType"
+                    }
+                }
+            ]
+        }, {
+            "id": "DataType",
+            "class": "com.tugmodel.client.model.meta.DataType"
+        }, {
+            "id": "tm.Employee",
+            "class": "com.tugmodel.client.model.sample.Employee",
+            "description": "Sample model.",
+            "attributes": [{
+                    "id": "name",
+                    "dataType": {
+                        "id": "String",
+                        "max": 100
+                    }
+                }
+            ]
+        }        
+    ],   
+    
+    ////////////////////////////// DATATYPES //////////////////////////////
+    "dataTypes": [{
+            "id": "String",
+            "class": "java.lang.String",
+            "min": 0,
+            "max": 2147483647
+            // TODO: "validatorId"
+        }, {
+            "id": "StringMax64",
+            "class": "java.lang.String",
+            "min": 0,
+            "max": 64
+        }, {
+            "id": "Integer",
+            "class": "java.lang.Integer"
+        }, {
+            "id": "oneOne",
+            "javaType": "java.lang.Object"
+        }
+    ],
+    
+    ////////////////////////////// TUGS //////////////////////////////
+    "tugs": [{
+            "id": "baseTug",
+            "class": "com.tugmodel.tug.base.BaseCrudTug",
+            "mapper": {
+                "id": "defaultMapper"
+            }
+        }, {
+            "id": "configTug",
+            "class": "com.tugmodel.tug.config.ConfigTug",
+            "defaultConfigPath": "/tugmodel/tugmodel-config-defaults.json",
+            "customConfigPath": "/tugmodel/tugmodel-config.json",
+            "mapper": {
+                "id": "defaultMapper"
+            }
+        }, {
+            "id": "folderBasedTug",
+            "class": "com.tugmodel.tug.file.FolderBasedTug",
+            "path": "c:/temp/test",
+            "mapper": {
+                "id": "defaultMapper"
+            }
+        },{
+            "id": "simpleWorkflow",
+            "class": "com.tugmodel.client.tug.LinearWorkflow",
+            "workflow": {
+                // authentication will look inside the model for 3 fields: $user, $password, $organization(optional)
+                // authorization e.g. model.update() will checke for update privilege (please provide privilege
+                //    mapping according to executed method as inline settings in the tug id.
+                "definition": ["authentication", "authorization"]
+            },
+            "compensate": false
+        }, {
+            "id": "sqlTug",
+            "class": "com.tugmodel.tug.sql.SQLTug",
+            "mapper": {
+                "id": "defaultMapper"
+            },
+            "dbDriver": "com.mysql.jdbc.Driver",
+            "dbUrl": "jdbc:mysql://localhost:3306/testcris",
+            "user": "root",
+            "pass": "",
+            "dataType2dbType": {
+                // First lookup is in DataType.get("dbType");
+                "java": { // Second lookup.
+                    "java.lang.String": "varchar(255)",
+                    "java.lang.Integer": "int"
                 },
-                "compensate": false
-            },
-            {
-                "id": "baseTug",
-                "class": "com.tugmodel.tug.BaseTug",
-                "mapper": {
-                    "id": "nonMetaBasedMapper"
-                } 
-            },
-            {
+                "default": "varchar(255)" // Third lookup.
+            }
+        }
+    ],
+    
+    ////////////////////////////// MAPPERS //////////////////////////////
+    // A mapper is used by a tug to map a model to a format 'transportable' by the tug.
+    "mappers": [{
+            "id": "defaultMapper",
+            "factory": "com.tugmodel.mapper.jackson.JacksonMappers",
+            "factoryMethod": "getConfigReaderMapper"
+            //"indent": true,
+            //"writeDatesAsTimestamps": true,
+            //"doNotIncludeNulls": true,
+            //"detectIsGetters": false,
+            //"enableDefaultTyping": true
+        }, {
+            "id": "metaBasedMapper",
+            "factory": "com.tugmodel.mapper.jackson.JacksonMappers",
+            "factoryMethod": "getMetaBasedMapper"
+        }
+    ],
+    
+    ////////////////////////////// TOWS //////////////////////////////
+    // TOWS binds models to tugs, i.e. the list of (model, tug, tenant, condition, ...) relations.
+    // Tug initiator for a model is the tug that serves the type of model or a parent class.
+    "tows": [
+        {
+            "modelId": "Model",
+            "tug": {
+                // You can add customisations inline the towing and they will overwrite the defaults.
+                "id": "configTug"
+            }
+            // tenant,
+            // condition
+        }, 
+        {
+            "modelId": "Config",
+            "tug": {
                 "id": "configTug",
-                "class": "com.tugmodel.tug.config.ConfigTug",
-                "modelId": "Config",
-                "mapper": {
-                    "id": "nonMetaBasedMapper"
-                }
-            },
-            {
-                "id": "metaTug",
-                "class": "com.tugmodel.tug.meta.MetaTug",
-                "modelId": "Meta",
-                "mapperId": "nonMetaBasedMapper"
-            },
-            {
-                "id": "sqlTug",
-                "class": "com.tugmodel.tug.sql.SQLTug",
-                "modelId": "Employee",
-                "mapper": {
-                    "id": "defaultMapper"
-                },              
-                "dbDriver": "com.mysql.jdbc.Driver",
-                "dbUrl": "jdbc:mysql://localhost:3306/testcris",
-                "user": "root",
-                "pass": "",
-                "dataType2dbType": {
-                    // First lookup is in DataType.get("dbType");
-                    "java": {                    // Second lookup.
-                        "java.lang.String": "varchar(255)",
-                        "java.lang.Integer": "int"
-                    },
-                    "default": "varchar(255)"    // Third lookup.
-                }
+                "type": "all",
+                "cache": true                
             }
-        ],  
-        
-        "note2": "A mapper is used by a tug to map a model to a format 'transportable' by the tug.",            
-        "mappers": [
-            {
-                "id": "defaultMapper",
-                "factory": "com.tugmodel.mapper.JacksonMappers",
-                "factory-method": "getMapper",              
-                "config": {
-                    "indent": true,
-                    "writeDatesAsTimestamps": true,
-                    "doNotIncludeNulls": true,
-                    "detectIsGetters": false,
-                    "enableDefaultTyping": true
-                }
-            },
-            {
-                "id": "nonMetaBasedMapper",
-                "factory": "com.tugmodel.mapper.JacksonMappers",
-                "factory-method": "getConfigReaderMapper",              
-                "config": {
-                    "indent": true,
-                    "writeDatesAsTimestamps": true,
-                    "doNotIncludeNulls": true,
-                    "detectIsGetters": false                
-                }
+        },        
+        {
+            "modelId": "Meta",
+            "tug": {
+                "id": "configTug",
+                "type": "models",
+                "cache": true
             }
-        ]
-    },
-    // The list of (model, tug, tenant, condition, ...) relations.
-    "tows": {
-        "tows": [    
-            {
-                "modelId": "Model",
-                "tugId": "baseTug"
-            }   
-        ]   
-    }
+        },
+        {
+            "modelId": "TugConfig",
+            "tug": {
+                "id": "configTug",
+                "type": "tugs",
+                "cache": true
+            }
+        },
+        {
+            "modelId": "TowConfig",
+            "tug": {
+                "id": "configTug",
+                "type": "tows",
+                "cache": true
+            }
+        },
+        {
+            "modelId": "MapperConfig",
+            "tug": {
+                "id": "configTug",
+                "type": "mappers",
+                "cache": true
+            }
+        },
+        {
+            "modelId": "DataType",
+            "tug": {
+                "id": "configTug",
+                "type": "dataTypes",
+                "cache": true
+            }
+        },
+        {
+            "modelId": "tm.Employee",
+            "tug": {
+                "id": "folderBasedTug",
+                "path": "employees"
+            }
+        }
+    ]
+
 }
