@@ -75,7 +75,7 @@ public class Model<M extends Model> implements Cloneable {
     public static final String KEY_TENANT = "tenant";
     public static final String KEY_CLASS = "class";
     protected boolean usesMeta = false;   // If meta should be used when obtaining extra attributes or just reflection.
-    protected Map<String, Object> data = Collections.synchronizedMap(new LinkedHashMap<String, Object>());
+    protected Map<String, Object> data = new LinkedHashMap<String, Object>();
 
     public Model() {
         setId(UUID.randomUUID().toString());
@@ -211,7 +211,7 @@ public class Model<M extends Model> implements Cloneable {
     }
 
     // Returns attributes that are set but do not have dedicated getters nor listed in the metadata.
-    public Map<String, ?> extraFields() {
+    public Map<String, Object> extraFields() {
         Map<String, Object> extra = new HashMap();  // this.hashCode()
 
         if (!usesMeta) {

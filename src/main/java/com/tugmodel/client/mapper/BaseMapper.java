@@ -35,6 +35,16 @@ public class BaseMapper<M extends Model> implements Mapper<M> {
 		return (M)notImplementedException();
 	}
 
+    @Override
+    public Object serialize(Object src) {
+        return notImplementedException();
+    }
+
+    @Override
+    public <T> T deserialize(Object src, Class<T> destClass) {
+        return (T) notImplementedException();
+    }
+
     public void updateModel(Object src, M destClass) {
 		notImplementedException();
 	}

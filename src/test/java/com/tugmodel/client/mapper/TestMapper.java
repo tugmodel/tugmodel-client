@@ -23,35 +23,34 @@ import com.tugmodel.client.model.config.tugs.TugConfig;
 
 public class TestMapper {
 
-	
-	@Test
-	public void testConvert() {
-		Mapper<Model> mapper = new Mapper<Model>() {
+    @Test
+    public void testConvert() {
+        Mapper<Model> mapper = new Mapper<Model>() {
 
             public Object serialize(Model src) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+                // TODO Auto-generated method stub
+                return null;
+            }
 
             public Model deserialize(Object src) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+                // TODO Auto-generated method stub
+                return null;
+            }
 
             public void updateModel(Object src, Model dest) {
-				// TODO Auto-generated method stub
-				
-			}
+                // TODO Auto-generated method stub
+
+            }
 
             public <T> T convert(Object src, Class<T> destClass) {
-				// TODO Auto-generated method stub
+                // TODO Auto-generated method stub
                 return (T) String.valueOf(src);
-			}
+            }
 
             public String toPrettyString(Object src) {
-				// TODO Auto-generated method stub
-				return null;
-			}
+                // TODO Auto-generated method stub
+                return null;
+            }
 
             @Override
             public void setTugConfig(TugConfig tc) {
@@ -65,9 +64,21 @@ public class TestMapper {
                 return null;
             }
 
-		};
-		
-		String res = mapper.convert(3, String.class);
-		assertTrue("3".equals(res));
-	}
+            @Override
+            public Object serialize(Object src) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public <T> T deserialize(Object src, Class<T> destClass) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+        };
+
+        String res = mapper.convert(3, String.class);
+        assertTrue("3".equals(res));
+    }
 }

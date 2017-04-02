@@ -31,8 +31,7 @@ import com.tugmodel.client.util.ModelUtil;
  */
 public class TestModelUtil {
 
-    
-    
+
     @Test
     public void testMerge() {
         Map dest = new HashMap();
@@ -42,7 +41,7 @@ public class TestModelUtil {
         Map src = new HashMap();
         src.put("a", 2);
         src.put("c", 1);
-        
+
         ModelUtil.mergeDeeply(src, dest);
 
         assertTrue((Integer) src.get("b") == null);
@@ -69,7 +68,7 @@ public class TestModelUtil {
         srcSubMap.put("sa", 2);
         srcSubMap.put("sc", 1);
         src.put("subMap", srcSubMap);
-        
+
         ModelUtil.mergeDeeply(src, dest);
         assertTrue((Integer) ((Map) dest.get("subMap")).get("sa") == 2);
         assertTrue((Integer) ((Map) dest.get("subMap")).get("sc") == 1);
@@ -94,7 +93,7 @@ public class TestModelUtil {
         srcSubModel.set("sa", 2);
         srcSubModel.set("sc", 1);
         src.put("subModel", srcSubModel);
-        
+
         ModelUtil.mergeDeeply(src, dest);
         assertTrue((Integer) ((Model) dest.get("subModel")).get("sa") == 2);
         assertTrue((Integer) ((Model) dest.get("subModel")).get("sc") == 1);
@@ -107,6 +106,31 @@ public class TestModelUtil {
         List l2 = m.clone().asList("a");
 
         assertTrue(l1 != l2);
+    }
+
+    @Test
+    public void testMergeSubArray() {
+
+        ArrayList srcList = new ArrayList();
+        ArrayList destList = new ArrayList();
+
+        Map dest = new HashMap();
+        dest.put("a", 1);
+        dest.put("list", destList);
+
+        Map src = new HashMap();
+        src.put("a", 2);
+        src.put("list", srcList);
+
+        srcList.add(new Model().setId("random").set("x", "3"));
+        srcList.add(new Model().setId("same").set("x", "1"));
+
+        destList.add(new Model().setId("same").set("x", "2")); // After merging should be 1.
+
+        ModelUtil.mergeDeeply(src, dest);
+        List mergedList = (List) dest.get("list");
+        assertTrue(((Model) mergedList.get(0)).get("x").equals("1"));
+
     }
 
 }

@@ -7,7 +7,7 @@
     
     ////////////////////////////// MODELS //////////////////////////////
     "models": [{
-            "id": "Model",
+            "id": "tm.Model",
             "class": "com.tugmodel.client.model.Model",
             // If 'class' is specified then no need to specify 'parent':'<modelId>'.
             // "Model classes can be generated automatically(freemaker) using default interpreter or your own but is better that you manually maintain them.
@@ -16,43 +16,43 @@
                     "id": "id",
                     "dataType": {
                         // It is merged with the one in metadata.dataTypes.
-                        "id": "String",
+                        "id": "tm.datatype.String",
                         "max": "1001"
                     }
                 }
             ]
         }, 
         {
-            "id": "Config",
+            "id": "tm.Config",
             "class": "com.tugmodel.client.model.config.Config",
             "description": "Keeps an entire configuration(models, tugs, tows, ...)."
             // If you want to store your custom config in a db, then change the tow for modelId=Config.
             // If you want a different model for keeping configurations then extend the 'class' above and tow.
         },
         {
-            "id": "MapperConfig",
+            "id": "tm.MapperConfig",
             "class": "com.tugmodel.client.model.config.tugs.MapperConfig"
         },
         {
-            "id": "TugConfig",
+            "id": "tm.TugConfig",
             "class": "com.tugmodel.client.model.config.tugs.TugConfig"
         },
         {
-            "id": "TowConfig",
+            "id": "tm.TowConfig",
             "class": "com.tugmodel.client.model.config.tugs.TowConfig"
         },
         {
-            "id": "DataType",
+            "id": "tm.DataType",
             "class": "com.tugmodel.client.model.meta.datatype.DataType"
         },
         {
-            "id": "Meta",
+            "id": "tm.Meta",
             "class": "com.tugmodel.client.model.meta.Meta",
             "description": "Meta model.",
             "attributes": [{
                     "id": "description",
                     "dataType": {
-                        "id": "String"
+                        "id": "tm.datatype.String"
                     }
                 }, {
                     "id": "attributes",
@@ -68,23 +68,23 @@
                         //"reference":"Address",
 
                         "id": "oneMany",
-                        "reference": "Attribute"
+                        "reference": "tm.Attribute"
                     }
                 }
             ]
         }, {
-            "id": "Attribute",
+            "id": "tm.Attribute",
             "class": "com.tugmodel.client.model.meta.Attribute",
             "attributes": [{
                     "id": "dataType",
                     "dataType": {
                         "id": "oneOne",
-                        "reference": "DataType"
+                        "reference": "tm.DataType"
                     }
                 }
             ]
         }, {
-            "id": "DataType",
+            "id": "tm.DataType",
             "class": "com.tugmodel.client.model.meta.DataType"
         }, {
             "id": "tm.Employee",
@@ -101,48 +101,48 @@
         }        
     ],   
     
-    ////////////////////////////// DATATYPES //////////////////////////////
+    ////////////////////////////// DATATYPES DEFAULTS. //////////////////////////////
     "dataTypes": [{
-            "id": "String",
+            "id": "tm.datatype.String",
             "class": "java.lang.String",
             "min": 0,
             "max": 2147483647
             // TODO: "validatorId"
         }, {
-            "id": "StringMax64",
+            "id": "tm.datatype.String64",
             "class": "java.lang.String",
             "min": 0,
             "max": 64
         }, {
-            "id": "Integer",
+            "id": "tm.datatype.Integer",
             "class": "java.lang.Integer"
         }, {
-            "id": "oneOne",
+            "id": "tm.datatype.oneOne",
             "javaType": "java.lang.Object"
         }
     ],
     
-    ////////////////////////////// TUGS //////////////////////////////
+    ////////////////////////////// TUGS DEFINITIONS. //////////////////////////////
     "tugs": [{
-            "id": "baseTug",
+            "id": "tm.tug.base.baseCrudTug",
             "class": "com.tugmodel.tug.base.BaseCrudTug",
             "mapper": {
-                "id": "defaultMapper"
+                "id": "tm.mapper.defaultMapper"
             }
         }, {
-            "id": "configTug",
+            "id": "tm.tug.base.configTug",
             "class": "com.tugmodel.tug.config.ConfigTug",
             "defaultConfigPath": "/tugmodel/tugmodel-config-defaults.json",
             "customConfigPath": "/tugmodel/tugmodel-config.json",
             "mapper": {
-                "id": "defaultMapper"
+                "id": "tm.mapper.defaultMapper"
             }
         }, {
-            "id": "folderBasedTug",
+            "id": "tm.tug.base.folderBasedTug",
             "class": "com.tugmodel.tug.file.FolderBasedTug",
             "path": "c:/temp/test",
             "mapper": {
-                "id": "defaultMapper"
+                "id": "tm.mapper.defaultMapper"
             }
         },{
             "id": "simpleWorkflow",
@@ -155,10 +155,10 @@
             },
             "compensate": false
         }, {
-            "id": "sqlTug",
+            "id": "tm.tug.base.sqlTug",
             "class": "com.tugmodel.tug.sql.SQLTug",
             "mapper": {
-                "id": "defaultMapper"
+                "id": "tm.mapper.defaultMapper"
             },
             "dbDriver": "com.mysql.jdbc.Driver",
             "dbUrl": "jdbc:mysql://localhost:3306/testcris",
@@ -178,7 +178,7 @@
     ////////////////////////////// MAPPERS //////////////////////////////
     // A mapper is used by a tug to map a model to a format 'transportable' by the tug.
     "mappers": [{
-            "id": "defaultMapper",
+            "id": "tm.mapper.defaultMapper",
             "factory": "com.tugmodel.mapper.jackson.JacksonMappers",
             "factoryMethod": "getConfigReaderMapper"
             //"indent": true,
@@ -186,10 +186,11 @@
             //"doNotIncludeNulls": true,
             //"detectIsGetters": false,
             //"enableDefaultTyping": true
-        }, {
-            "id": "metaBasedMapper",
+        },
+        {
+            "id": "tm.mapper.typedMapper",
             "factory": "com.tugmodel.mapper.jackson.JacksonMappers",
-            "factoryMethod": "getMetaBasedMapper"
+            "factoryMethod": "getTypedMapper"
         }
     ],
     
@@ -198,58 +199,65 @@
     // Tug initiator for a model is the tug that serves the type of model or a parent class.
     "tows": [
         {
-            "modelId": "Model",
+            "id": "tm.tow.Model",  // Needed when merging.
+            "modelId": "tm.Model",  // TODO: Consider also "model" object.
             "tug": {
-                // You can add customisations inline the towing and they will overwrite the defaults.
-                "id": "configTug"
+                // You can add customisations inline the towing and they will be merged with the defaults.
+                "id": "tm.tug.base.configTug"
             }
             // tenant,
             // condition
         }, 
         {
-            "modelId": "Config",
+            "id": "tm.tow.Config",
+            "modelId": "tm.Config",
             "tug": {
-                "id": "configTug",
+                "id": "tm.tug.base.configTug",
                 "type": "all",
                 "cache": true                
             }
         },        
         {
-            "modelId": "Meta",
+            "id": "tm.tow.Meta",
+            "modelId": "tm.Meta",
             "tug": {
-                "id": "configTug",
+                "id": "tm.tug.base.configTug",
                 "type": "models",
                 "cache": true
             }
         },
         {
-            "modelId": "TugConfig",
+            "id": "tm.tow.TugConfig",
+            "modelId": "tm.TugConfig",
             "tug": {
-                "id": "configTug",
+                "id": "tm.tug.base.configTug",
                 "type": "tugs",
                 "cache": true
             }
         },
         {
-            "modelId": "TowConfig",
+            "id": "tm.tow.TowConfig",
+            "modelId": "tm.TowConfig",
             "tug": {
-                "id": "configTug",
+                "id": "tm.tug.base.configTug",
                 "type": "tows",
                 "cache": true
             }
         },
         {
-            "modelId": "MapperConfig",
+            "id": "tm.tow.MapperConfig",
+            "modelId": "tm.MapperConfig",
             "tug": {
-                "id": "configTug",
+                "id": "tm.tug.base.configTug",
                 "type": "mappers",
                 "cache": true
             }
         },
         {
-            "modelId": "DataType",
+            "id": "tm.tow.DataType",
+            "modelId": "tm.DataType",
             "tug": {
-                "id": "configTug",
+                "id": "tm.tug.base.configTug",
                 "type": "dataTypes",
                 "cache": true
             }
@@ -257,8 +265,8 @@
         {
             "modelId": "tm.Employee",
             "tug": {
-                "id": "folderBasedTug",
-                "path": "employees"
+                "id": "tm.tug.base.folderBasedTug",
+                "path": "/employees"
             }
         }
     ]

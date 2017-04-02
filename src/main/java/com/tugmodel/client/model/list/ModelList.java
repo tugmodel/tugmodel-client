@@ -164,20 +164,18 @@ public class ModelList<M extends Model> extends ArrayList<M> {
 
     protected boolean fetched = false;
     
-    protected void fetchIfNeeded() {
+    public ModelList<M> fetchIfNeeded() {
         if (fetched)
-            return;
-		try {
-            CrudTug<M> crudTug = tug();
-            if (crudTug == null)
-                crudTug = TugFactory.getCrud((Class<M>) Class.forName(modelId));
-            List<M> list = crudTug.fetch(this);
-	        this.addAll(list);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}        
+            return this;
+
+        CrudTug<M> crudTug = tug();
+        if (crudTug == null)
+            crudTug = TugFactory.getCrud(modelId);
+        List<M> list = crudTug.fetch(this);
+        this.addAll(list);
 
         fetched = true;
+        return this;
     }
 
     ////////// Overwrite ArrayList methods to allow lazy behavior. //////////

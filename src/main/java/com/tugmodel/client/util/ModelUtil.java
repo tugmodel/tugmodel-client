@@ -16,8 +16,10 @@ package com.tugmodel.client.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import com.tugmodel.client.model.Model;
 
@@ -25,6 +27,26 @@ import com.tugmodel.client.model.Model;
  * Model related utilities.
  */
 public class ModelUtil {
+
+    private static Object search(TreeSet treeset, Object key) {
+        Object ceil = treeset.ceiling(key); // least elt >= key
+        Object floor = treeset.ceiling(key); // highest elt <= key
+        return ceil == floor ? ceil : null;
+    }
+
+    private static class MergeComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            if (o1 instanceof Map && o2 instanceof Map) {
+                Map o1Map = (Map) o1, o2Map = (Map) o2;
+                if (o1Map.get("id") != null && o2Map.get("id") != null) {
+                    return ((String) o1Map.get("id")).compareTo((String) o2Map.get("id"));
+                }
+            } else if (o1 instanceof Model && o2 instanceof Model) {
+                return (((Model) o1).getId().compareTo(((Model) o2).getId()));
+            }
+            return 1; // Greater.
+        }
+    }
 
     public static void mergeDeeply(Map src, Map dest) {
         for (Object key : src.keySet()) {
@@ -52,6 +74,31 @@ public class ModelUtil {
                     continue;
                 } else if (Map.class.isAssignableFrom(destValueClass)) {
                     mergeDeeply(((Map) srcValue), ((Map) destValue));
+                    continue;
+                } else if (Collection.class.isAssignableFrom(destValueClass)) {
+                    // Set intersection.
+                    // HashSet set = new HashSet((Collection)destValue);
+                    // set.addAll((Collection)srcValue);
+                    TreeSet srcSet = new TreeSet(new MergeComparator());
+                    TreeSet destSet = new TreeSet(new MergeComparator());
+                    Collection srcCollection = (Collection) srcValue;
+                    Collection destCollection = (Collection) destValue;
+                    srcSet.addAll(srcCollection);
+                    destSet.addAll(destCollection);
+                    for (Object o : srcCollection) {
+                        if (o instanceof Map && destSet.contains(o)) {
+                            mergeDeeply(((Map) o), (Map) search(destSet, o));
+                        } else if (o instanceof Model && destSet.contains(o)) {
+                            Model destModel = ((Model) search(destSet, o));
+                            if (destModel != null) {
+                                mergeDeeply(((Model) o).data(), destModel.data());
+                            } else {
+                                destCollection.add(o);
+                            }
+                        } else {
+                            destCollection.add(o);
+                        }
+                    }
                     continue;
                 }
             }

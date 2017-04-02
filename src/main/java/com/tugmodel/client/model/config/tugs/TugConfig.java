@@ -47,6 +47,7 @@ public class TugConfig extends Model<TugConfig> {
     }
     public TugConfig mapper(Mapper val) {
         cachedMapper = val;
+        cachedMapper.setTugConfig(this);
         return this;
     }
 
@@ -80,3 +81,4 @@ public class TugConfig extends Model<TugConfig> {
     }
 
 }
+

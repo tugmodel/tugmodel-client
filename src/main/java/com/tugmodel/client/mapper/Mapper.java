@@ -29,26 +29,29 @@ public interface Mapper<M extends Model> {
 
     public TugConfig getTugConfig();
 
-	/**
-	 * Converts into RAW data that is suitable for communication.  
-	 * TODO: Leave only convert method and remove the M type parameter.
-	 */
-    public abstract Object serialize(M src);
-	
+    /**
+     * Converts into RAW data that is suitable for communication. TODO: Leave only convert method and remove the M type
+     * parameter.
+     */
+    public Object serialize(M src);
+
     public M deserialize(Object src);
 
+    public Object serialize(Object src);
+
+    public <T> T deserialize(Object src, Class<T> destClass);
+
     public void updateModel(Object src, M dest);
-	
-	/**
-	 * E.g. Jackson, 2 step conversion: Writing a POJO as JSON, and second, binding that JSON into another kind of POJO.
-	 * When using also provide type parameter, ((Mapper<Model>) mapper).convert.
-	 */
+
+    /**
+     * E.g. Jackson, 2 step conversion: Writing a POJO as JSON, and second, binding that JSON into another kind of POJO.
+     * When using also provide type parameter, ((Mapper<Model>) mapper).convert.
+     */
     public <T> T convert(Object src, Class<T> destClass);
-	
     
-	/**
-	 * Used in debug/development mode to have access to a pretty print of the actual model or object. 
-	 */
+    /**
+     * Used in debug/development mode to have access to a pretty print of the actual model or object.
+     */
     public String toPrettyString(Object src);
 	
 	
