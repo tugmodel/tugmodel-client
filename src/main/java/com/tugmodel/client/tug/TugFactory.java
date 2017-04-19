@@ -35,7 +35,7 @@ import com.tugmodel.client.tug.config.IConfigTug;
  * 
  */
 @SuppressWarnings("all")
-public class TugFactory {
+public class Tugs {
 
     // // Using pair maps allows for lazy initialization of tugs and model classes.
     // private static HashMap<String, String> MODEL_TO_TUG_ID = new HashMap<String, String>();
