@@ -183,4 +183,9 @@ var model = new Model().setId("x").fetch();
 # License #
 `tugmodel` is licensed under the [Apache License 2.0] (https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)). Click [link] (https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)) for more details.
 For additional/alternative licensing questions, please contact Cristian Donoiu.
-    
+
+# TODO #
+  * Delete "crudtug.run" method as it is breaking OOP rules.
+  * Add #first on ModelList.
+  * Add Meta#attributeId method.
+  * Continue JDBC crud tug implementation and take a look to JavaLite. For association consider the $ sign. E.g.  Parent.s.where($childProperty.id = ?, childId) .
