@@ -14,6 +14,7 @@ You can/should **plug in your own tugs, your own models and your own metadata**.
 - for abstracting the communication/processing layer(active record pattern - by Martin Fowler):
       `model.save()` instead of `MySaveService.save(model)`.
 - for allowing an **EXTENSIBLE model** (`model.set(key, value)`) where **unexpected** attributes can be stored by the model . 
+- for removing duplicate Domain Model APIs like Entities, (DTO)[https://stackoverflow.com/questions/36174516/rest-api-dtos-or-not] and without the corresponding conversion needed between them (manual conversion, Dozer, Orika).
 - for user friendly and implementation agnostic APIs.
 - for having the GUI derive the domain model metadata from backend metadata. **E.g.: if a model attribute maxLength restriction changes then that will automatically be enforced in the UI**.
 - for storing models in **database, files, memory**. Default implementations available for all three.
